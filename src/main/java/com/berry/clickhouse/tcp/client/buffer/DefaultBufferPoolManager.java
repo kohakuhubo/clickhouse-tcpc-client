@@ -9,10 +9,6 @@ public class DefaultBufferPoolManager implements BufferPoolManager {
 
     private final int blockSize;
 
-    public DefaultBufferPoolManager() {
-        this.blockSize = 1024 * 1024;
-    }
-
     public DefaultBufferPoolManager(int blockSize) {
         this.blockSize = blockSize;
     }

@@ -31,13 +31,6 @@ public class ClickHouseConfig implements Serializable {
     private final boolean ssl;
     private final String sslMode;
     private final String clientName;
-    private final int selfColumStackLength;
-    private final int systemColumStackLength;
-    private final int selfByteBufferSize;
-    private final int selfByteBufferLength;
-    private final int systemByteBufferSize;
-    private final int systemByteBufferLength;
-    private final int systemByteBufferStackLength;
     private final int connectionPoolMaxIdle;
     private final int connectionPoolMinIdle;
     private final int connectionPoolTotal;
@@ -50,13 +43,6 @@ public class ClickHouseConfig implements Serializable {
                              Duration queryTimeout, Duration connectTimeout, boolean tcpKeepAlive,
                              boolean ssl, String sslMode, String charset, String clientName,
                              Map<SettingKey, Serializable> settings,
-                             int selfColumStackLength,
-                             int systemColumStackLength,
-                             int selfByteBufferSize,
-                             int selfByteBufferLength,
-                             int systemByteBufferSize,
-                             int systemByteBufferLength,
-                             int systemByteBufferStackLength,
                              int connectionPoolMaxIdle,
                              int connectionPoolMinIdle,
                              int connectionPoolTotal,
@@ -77,13 +63,6 @@ public class ClickHouseConfig implements Serializable {
         this.sslMode = sslMode;
         this.charset = charset;
         this.clientName = clientName;
-        this.selfColumStackLength = selfColumStackLength;
-        this.systemColumStackLength = systemColumStackLength;
-        this.selfByteBufferSize = selfByteBufferSize;
-        this.selfByteBufferLength = selfByteBufferLength;
-        this.systemByteBufferSize = systemByteBufferSize;
-        this.systemByteBufferLength = systemByteBufferLength;
-        this.systemByteBufferStackLength = systemByteBufferStackLength;
         this.connectionPoolMaxIdle = connectionPoolMaxIdle;
         this.connectionPoolMinIdle = connectionPoolMinIdle;
         this.connectionPoolTotal = connectionPoolTotal;
@@ -232,12 +211,8 @@ public class ClickHouseConfig implements Serializable {
         private Charset charset;
         private String clientName;
         private int selfColumStackLength;
-        private int systemColumStackLength;
         private int selfByteBufferSize;
         private int selfByteBufferLength;
-        private int systemByteBufferSize;
-        private int systemByteBufferLength;
-        private int systemByteBufferStackLength;
         private int connectionPoolMaxIdle;
         private int connectionPooMinIdle;
         private int connectionPoolTotal;
@@ -275,21 +250,6 @@ public class ClickHouseConfig implements Serializable {
             return this;
         }
 
-        public Builder systemByteBufferStackLength(int systemByteBufferStackLength) {
-            this.systemByteBufferStackLength = systemByteBufferStackLength;
-            return this;
-        }
-
-        public Builder systemByteBufferLength(int systemByteBufferLength) {
-            this.systemByteBufferLength = systemByteBufferLength;
-            return this;
-        }
-
-        public Builder systemByteBufferSize(int systemByteBufferSize) {
-            this.systemByteBufferSize = systemByteBufferSize;
-            return this;
-        }
-
         public Builder selfByteBufferLength(int selfByteBufferLength) {
             this.selfByteBufferLength = selfByteBufferLength;
             return this;
@@ -297,11 +257,6 @@ public class ClickHouseConfig implements Serializable {
 
         public Builder selfByteBufferSize(int selfByteBufferSize) {
             this.selfByteBufferSize = selfByteBufferSize;
-            return this;
-        }
-
-        public Builder systemColumStackLength(int systemColumStackLength) {
-            this.systemColumStackLength = systemColumStackLength;
             return this;
         }
 
@@ -444,7 +399,10 @@ public class ClickHouseConfig implements Serializable {
             this.charset = Charset.forName((String) this.settings.getOrDefault(SettingKey.charset, "UTF-8"));
             this.clientName = (String) this.settings.getOrDefault(SettingKey.client_name,
                     String.format(Locale.ROOT, "%s %s", ClickHouseDefines.NAME, "client"));
-            this.bufferPoolManager = (null == bufferPoolManager) ? new DefaultBufferPoolManager() : bufferPoolManager;
+            this.selfByteBufferSize = (this.selfByteBufferSize <= 0) ? 1024 * 1024 : this.selfByteBufferSize;
+            this.bufferPoolManager = (null == bufferPoolManager) ? new DefaultBufferPoolManager(this.selfByteBufferSize) : bufferPoolManager;
+            this.selfColumStackLength = (this.selfColumStackLength <= 0) ? 1024 : this.selfColumStackLength;
+            this.selfByteBufferLength = (this.selfByteBufferLength <= 0) ? 1: this.selfByteBufferLength;
             this.columnWriterBufferPoolManager = (null == columnWriterBufferPoolManager) ? new DefaultColumnWriterBufferPoolManager(this.selfColumStackLength, this.selfByteBufferLength) : columnWriterBufferPoolManager;
 
             revisit();
@@ -452,10 +410,6 @@ public class ClickHouseConfig implements Serializable {
 
             return new ClickHouseConfig(host, port, database, user, password, queryTimeout, connectTimeout,
                     tcpKeepAlive, ssl, sslMode, charset.name(), clientName, settings,
-                    selfColumStackLength, systemColumStackLength,
-                    selfByteBufferSize, selfByteBufferLength,
-                    systemByteBufferSize, systemByteBufferLength,
-                    systemByteBufferStackLength,
                     connectionPoolMaxIdle, connectionPooMinIdle, connectionPoolTotal,
                     serializedIPv4, serializedIPv6, columnWriterBufferPoolManager, bufferPoolManager);
         }
@@ -484,34 +438,6 @@ public class ClickHouseConfig implements Serializable {
             this.settings.remove(SettingKey.charset);
             this.settings.remove(SettingKey.client_name);
         }
-    }
-
-    public int getSystemByteBufferLength() {
-        return systemByteBufferLength;
-    }
-
-    public int getSystemByteBufferSize() {
-        return systemByteBufferSize;
-    }
-
-    public int getSelfByteBufferLength() {
-        return selfByteBufferLength;
-    }
-
-    public int getSelfByteBufferSize() {
-        return selfByteBufferSize;
-    }
-
-    public int getSystemColumStackLength() {
-        return systemColumStackLength;
-    }
-
-    public int getSelfColumStackLength() {
-        return selfColumStackLength;
-    }
-
-    public int getSystemByteBufferStackLength() {
-        return systemByteBufferStackLength;
     }
 
     public int getConnectionPoolMaxIdle() {
