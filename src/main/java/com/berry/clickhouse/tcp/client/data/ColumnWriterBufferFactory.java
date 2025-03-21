@@ -1,22 +1,20 @@
 package com.berry.clickhouse.tcp.client.data;
 
+import com.berry.clickhouse.tcp.client.buffer.BufferPoolManager;
 import com.berry.clickhouse.tcp.client.settings.ClickHouseConfig;
 
 import java.nio.ByteBuffer;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.function.Supplier;
 
 public class ColumnWriterBufferFactory {
 
-    private final Queue<ColumnWriterBuffer> stack;
-
     private static volatile ColumnWriterBufferFactory INSTANCE;
 
-    private final Queue<ByteBuffer> systemByteBufferQueue;
+    private final ColumnWriterBufferPoolManager columnWriterBufferPoolManager;
 
-    private final Queue<ColumnWriterBuffer> systemColumnWriterBufferQueue;
-
-    private final ClickHouseConfig clickHouseConfig;
+    private final BufferPoolManager bufferPoolManager;
 
     public static ColumnWriterBufferFactory getInstance(ClickHouseConfig clickHouseConfig) {
         if (null == INSTANCE) {
@@ -30,36 +28,15 @@ public class ColumnWriterBufferFactory {
     }
 
     private ColumnWriterBufferFactory(ClickHouseConfig clickHouseConfig) {
-        this.clickHouseConfig = clickHouseConfig;
-        this.stack = new ArrayBlockingQueue<>(clickHouseConfig.getSelfColumStackLength());
-        this.systemByteBufferQueue = new ArrayBlockingQueue<>(clickHouseConfig.getSystemByteBufferStackLength());
-        this.systemColumnWriterBufferQueue = new ArrayBlockingQueue<>(clickHouseConfig.getSystemColumStackLength());
+        this.columnWriterBufferPoolManager = clickHouseConfig.getColumnWriterBufferPoolManager();
+        this.bufferPoolManager = clickHouseConfig.getBufferPoolManager();
     }
 
-    public ColumnWriterBuffer getBuffer(boolean isUserSystemBuffer) {
-        Queue<ColumnWriterBuffer> queue = isUserSystemBuffer ? systemColumnWriterBufferQueue : stack;
-        ColumnWriterBuffer pop = queue.poll();
-        if (pop == null) {
-            int size = isUserSystemBuffer ? this.clickHouseConfig.getSystemByteBufferSize() : this.clickHouseConfig.getSelfByteBufferSize();
-            int length = isUserSystemBuffer ? this.clickHouseConfig.getSystemByteBufferLength() : this.clickHouseConfig.getSelfByteBufferLength();
-            return new ColumnWriterBuffer(size, length, isUserSystemBuffer ? systemByteBufferQueue : null);
-        } else {
-            pop.reset();
-            return pop;
-        }
-    }
-
-    public void clearAllBuffers() {
-        while (true)  {
-            ColumnWriterBuffer pop = stack.poll();
-            if (pop == null) {
-                break;
-            }
-        }
+    public ColumnWriterBuffer getBuffer(IColumn column) {
+        return this.columnWriterBufferPoolManager.allocate(column, this.bufferPoolManager);
     }
 
     public void recycleBuffer(ColumnWriterBuffer buffer) {
-        Queue<ColumnWriterBuffer> stack = buffer.isUseSysColumnWriterBuffer() ? this.systemColumnWriterBufferQueue : this.stack;
-        stack.offer(buffer);
+        this.columnWriterBufferPoolManager.recycle(buffer);
     }
 }

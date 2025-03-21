@@ -7,8 +7,8 @@ import java.sql.SQLException;
 
 public class Column extends AbstractColumn {
 
-    public Column(String name, IDataType<?> type, byte[] nameBytes, Object[] values, boolean useSystemBuffer) {
-        super(name, type, nameBytes, values, useSystemBuffer);
+    public Column(String name, IDataType<?> type, byte[] nameBytes, Object[] values) {
+        super(name, type, nameBytes, values);
         this.values = values;
     }
 

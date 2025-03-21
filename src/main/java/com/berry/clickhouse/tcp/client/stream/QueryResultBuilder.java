@@ -69,7 +69,7 @@ public class QueryResultBuilder {
         IColumn[] headerColumns = new IColumn[columnNum];
         Object[] emptyObjects = new Object[columnNum];
         for (int c = 0; c < columnNum; c++) {
-            headerColumns[c] = ColumnFactory.createColumn(columnNames.get(c), columnTypes.get(c), null, emptyObjects, false);
+            headerColumns[c] = ColumnFactory.createColumn(columnNames.get(c), columnTypes.get(c), null, emptyObjects);
         }
         Block headerBlock = new Block(0, headerColumns);
 
@@ -79,7 +79,7 @@ public class QueryResultBuilder {
             for (int r = 0; r < rows.size(); r++) {
                 columnObjects[r] = rows.get(r).get(c);
             }
-            dataColumns[c] = ColumnFactory.createColumn(columnNames.get(c), columnTypes.get(c), null, columnObjects, false);
+            dataColumns[c] = ColumnFactory.createColumn(columnNames.get(c), columnTypes.get(c), null, columnObjects);
         }
         Block dataBlock = new Block(rows.size(), dataColumns);
 

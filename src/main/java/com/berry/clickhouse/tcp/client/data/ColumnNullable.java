@@ -13,10 +13,10 @@ public class ColumnNullable extends AbstractColumn {
     private final List<Byte> nullableSign;
     private final IColumn data;
 
-    public ColumnNullable(String name, DataTypeNullable type, byte[] nameBytes, Object[] values, boolean useSystemBuffer) {
-        super(name, type, nameBytes, values, useSystemBuffer);
+    public ColumnNullable(String name, DataTypeNullable type, byte[] nameBytes, Object[] values) {
+        super(name, type, nameBytes, values);
         nullableSign = new ArrayList<>();
-        data = ColumnFactory.createColumn(null, type.getNestedDataType(), nameBytes, null, useSystemBuffer);
+        data = ColumnFactory.createColumn(null, type.getNestedDataType(), nameBytes, null);
     }
 
     @Override

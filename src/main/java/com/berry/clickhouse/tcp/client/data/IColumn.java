@@ -44,8 +44,6 @@ public interface IColumn {
 
     void rewind();
 
-    boolean isUseSysBuffer();
-
     Object[] values();
 }
 

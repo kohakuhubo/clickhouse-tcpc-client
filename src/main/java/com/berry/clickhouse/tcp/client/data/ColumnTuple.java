@@ -11,13 +11,13 @@ public class ColumnTuple extends AbstractColumn {
 
     private final IColumn[] columnDataArray;
 
-    public ColumnTuple(String name, DataTypeTuple type, byte[] nameBytes, Object[] values, boolean useSystemBuffer) {
-        super(name, type, nameBytes, values, useSystemBuffer);
+    public ColumnTuple(String name, DataTypeTuple type, byte[] nameBytes, Object[] values) {
+        super(name, type, nameBytes, values);
 
         IDataType<?>[] types = type.getNestedTypes();
         columnDataArray = new IColumn[types.length];
         for (int i = 0; i < types.length; i++) {
-            columnDataArray[i] = ColumnFactory.createColumn(null, types[i], nameBytes, null, useSystemBuffer);
+            columnDataArray[i] = ColumnFactory.createColumn(null, types[i], nameBytes, null);
         }
     }
 
@@ -50,7 +50,7 @@ public class ColumnTuple extends AbstractColumn {
         super.setColumnWriterBuffer(buffer);
 
         for (IColumn data : columnDataArray) {
-            data.setColumnWriterBuffer(factory.getBuffer(data.isUseSysBuffer()));
+            data.setColumnWriterBuffer(factory.getBuffer(data));
         }
     }
 

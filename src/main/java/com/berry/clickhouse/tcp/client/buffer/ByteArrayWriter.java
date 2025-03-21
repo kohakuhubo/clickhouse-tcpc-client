@@ -7,12 +7,13 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ByteArrayWriter implements BuffedWriter, BuffedReader {
 
     private int nextReadBuffer;
-
-    private final int blockSize;
 
     private ByteBuffer buffer;
 
@@ -21,19 +22,21 @@ public class ByteArrayWriter implements BuffedWriter, BuffedReader {
     // LIFO queue
     private final Deque<ByteBuffer> freeList = new LinkedList<>();
 
-    private final Queue<ByteBuffer> systemFreeList;
-
     private final int freeListSize;
 
-    public ByteArrayWriter(int blockSize, int freeListSize, Queue<ByteBuffer> systemFreeList) {
-        this.blockSize = blockSize;
+    private final Supplier<ByteBuffer> allocateBuffer;
+
+    private final Consumer<ByteBuffer> recycleBuffer;
+
+    public ByteArrayWriter(int freeListSize, Supplier<ByteBuffer> allocateBuffer, Consumer<ByteBuffer> recycleBuffer) {
         reuseOrAllocateByteBuffer();
         this.freeListSize = freeListSize;
-        this.systemFreeList = systemFreeList;
+        this.allocateBuffer = allocateBuffer;
+        this.recycleBuffer = recycleBuffer;
     }
 
-    public ByteArrayWriter(int blockSize) {
-        this(blockSize, -1, null);
+    public ByteArrayWriter(Supplier<ByteBuffer> allocateBuffer, Consumer<ByteBuffer> recycleBuffer) {
+        this(-1, allocateBuffer, recycleBuffer);
     }
 
     @Override
@@ -112,13 +115,8 @@ public class ByteArrayWriter implements BuffedWriter, BuffedReader {
         } else {
             for (int i = 0; i < byteBufferList.size(); i++) {
                 if (i >= this.freeListSize) {
-                    if (null != this.systemFreeList) {
-                        ByteBuffer b = byteBufferList.get(i);
-                        ((Buffer) b).clear();
-                        systemFreeList.offer(b);
-                    } else {
-                        break;
-                    }
+                    ByteBuffer b = byteBufferList.get(i);
+                    this.recycleBuffer.accept(b);
                 } else {
                     ByteBuffer b = byteBufferList.get(i);
                     ((Buffer) b).clear();
@@ -133,14 +131,7 @@ public class ByteArrayWriter implements BuffedWriter, BuffedReader {
     private ByteBuffer reuseOrAllocateByteBuffer() {
         ByteBuffer newBuffer = freeList.pollLast();
         if (newBuffer == null) {
-            if (null != systemFreeList) {
-                newBuffer = systemFreeList.poll();
-                if (null == newBuffer) {
-                    newBuffer = ByteBuffer.allocate(blockSize);
-                }
-            } else {
-                newBuffer = ByteBuffer.allocate(blockSize);
-            }
+            newBuffer = allocateBuffer.get();
         }
 
         buffer = newBuffer;

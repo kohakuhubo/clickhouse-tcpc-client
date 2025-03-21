@@ -1,5 +1,9 @@
 package com.berry.clickhouse.tcp.client.settings;
 
+import com.berry.clickhouse.tcp.client.buffer.BufferPoolManager;
+import com.berry.clickhouse.tcp.client.buffer.DefaultBufferPoolManager;
+import com.berry.clickhouse.tcp.client.data.ColumnWriterBufferPoolManager;
+import com.berry.clickhouse.tcp.client.data.DefaultColumnWriterBufferPoolManager;
 import com.berry.clickhouse.tcp.client.jdbc.ClickhousePropertiesParser;
 import com.berry.clickhouse.tcp.client.misc.CollectionUtil;
 import com.berry.clickhouse.tcp.client.misc.StrUtil;
@@ -39,6 +43,8 @@ public class ClickHouseConfig implements Serializable {
     private final int connectionPoolTotal;
     private final String serializedIPv4;
     private final String serializedIPv6;
+    private final ColumnWriterBufferPoolManager columnWriterBufferPoolManager;
+    private final BufferPoolManager bufferPoolManager;
 
     private ClickHouseConfig(String host, int port, String database, String user, String password,
                              Duration queryTimeout, Duration connectTimeout, boolean tcpKeepAlive,
@@ -55,7 +61,9 @@ public class ClickHouseConfig implements Serializable {
                              int connectionPoolMinIdle,
                              int connectionPoolTotal,
                              String serializedIPv4,
-                             String serializedIPv6) {
+                             String serializedIPv6,
+                             ColumnWriterBufferPoolManager columnWriterBufferPoolManager,
+                             BufferPoolManager bufferPoolManager) {
         this.host = host;
         this.hosts = Arrays.asList(host.split(HOST_DELIMITER));
         this.port = port;
@@ -82,6 +90,8 @@ public class ClickHouseConfig implements Serializable {
         this.serializedIPv4 = serializedIPv4;
         this.serializedIPv6 = serializedIPv6;
         this.settings = settings;
+        this.bufferPoolManager = bufferPoolManager;
+        this.columnWriterBufferPoolManager = columnWriterBufferPoolManager;
     }
 
     public String host() {
@@ -234,6 +244,8 @@ public class ClickHouseConfig implements Serializable {
         private String serializedIPv4;
         private String serializedIPv6;
         private Map<SettingKey, Serializable> settings = new HashMap<>();
+        private BufferPoolManager bufferPoolManager;
+        private ColumnWriterBufferPoolManager columnWriterBufferPoolManager;
 
         private Builder() {
         }
@@ -295,6 +307,16 @@ public class ClickHouseConfig implements Serializable {
 
         public Builder selfColumStackLength(int selfColumStackLength) {
             this.selfColumStackLength = selfColumStackLength;
+            return this;
+        }
+
+        public Builder bufferPoolManager(BufferPoolManager bufferPoolManager) {
+            this.bufferPoolManager = bufferPoolManager;
+            return this;
+        }
+
+        public Builder columnWriterBufferPoolManager(ColumnWriterBufferPoolManager columnWriterBufferPoolManager) {
+            this.columnWriterBufferPoolManager = columnWriterBufferPoolManager;
             return this;
         }
 
@@ -422,6 +444,8 @@ public class ClickHouseConfig implements Serializable {
             this.charset = Charset.forName((String) this.settings.getOrDefault(SettingKey.charset, "UTF-8"));
             this.clientName = (String) this.settings.getOrDefault(SettingKey.client_name,
                     String.format(Locale.ROOT, "%s %s", ClickHouseDefines.NAME, "client"));
+            this.bufferPoolManager = (null == bufferPoolManager) ? new DefaultBufferPoolManager() : bufferPoolManager;
+            this.columnWriterBufferPoolManager = (null == columnWriterBufferPoolManager) ? new DefaultColumnWriterBufferPoolManager(this.selfColumStackLength, this.selfByteBufferLength) : columnWriterBufferPoolManager;
 
             revisit();
             purgeSettings();
@@ -433,7 +457,7 @@ public class ClickHouseConfig implements Serializable {
                     systemByteBufferSize, systemByteBufferLength,
                     systemByteBufferStackLength,
                     connectionPoolMaxIdle, connectionPooMinIdle, connectionPoolTotal,
-                    serializedIPv4, serializedIPv6);
+                    serializedIPv4, serializedIPv6, columnWriterBufferPoolManager, bufferPoolManager);
         }
 
         private void revisit() {
@@ -508,5 +532,13 @@ public class ClickHouseConfig implements Serializable {
 
     public String getSerializedIPv6() {
         return serializedIPv6;
+    }
+
+    public ColumnWriterBufferPoolManager getColumnWriterBufferPoolManager() {
+        return columnWriterBufferPoolManager;
+    }
+
+    public BufferPoolManager getBufferPoolManager() {
+        return bufferPoolManager;
     }
 }

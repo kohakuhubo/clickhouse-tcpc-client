@@ -13,21 +13,18 @@ public abstract class AbstractColumn implements IColumn {
     protected Object[] values;
     protected ColumnWriterBuffer buffer;
     protected int rowCnt = 0;
-    protected final boolean useSystemBuffer;
 
-    public AbstractColumn(String name, IDataType<?> type, Object[] values, boolean useSystemBuffer) {
+    public AbstractColumn(String name, IDataType<?> type, Object[] values) {
         this.name = name;
         this.type = type;
         this.values = values;
-        this.useSystemBuffer = useSystemBuffer;
     }
 
-    public AbstractColumn(String name, IDataType<?> type, byte[] nameBytes, Object[] values, boolean useSystemBuffer) {
+    public AbstractColumn(String name, IDataType<?> type, byte[] nameBytes, Object[] values) {
         this.name = name;
         this.nameBytes = nameBytes;
         this.type = type;
         this.values = values;
-        this.useSystemBuffer = useSystemBuffer;
     }
 
     @Override
@@ -93,11 +90,6 @@ public abstract class AbstractColumn implements IColumn {
     public int addRowCnt(int count) {
         this.rowCnt += count;
         return this.rowCnt;
-    }
-
-    @Override
-    public boolean isUseSysBuffer() {
-        return useSystemBuffer;
     }
 
     @Override

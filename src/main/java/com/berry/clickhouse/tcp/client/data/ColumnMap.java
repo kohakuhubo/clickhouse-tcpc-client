@@ -14,13 +14,13 @@ public class ColumnMap extends AbstractColumn {
 
     private final List<Long> offsets;
 
-    public ColumnMap(String name, DataTypeMap type, byte[] nameBytes, Object[] values, boolean useSystemBuffer) {
-        super(name, type, nameBytes, values, useSystemBuffer);
+    public ColumnMap(String name, DataTypeMap type, byte[] nameBytes, Object[] values) {
+        super(name, type, nameBytes, values);
         offsets = new ArrayList<>();
         IDataType<?>[] types = type.getNestedTypes();
         columnDataArray = new IColumn[types.length];
         for (int i = 0; i < types.length; i++) {
-            columnDataArray[i] = ColumnFactory.createColumn(null, types[i], nameBytes, null, useSystemBuffer);
+            columnDataArray[i] = ColumnFactory.createColumn(null, types[i], nameBytes, null);
         }
     }
 
@@ -69,7 +69,7 @@ public class ColumnMap extends AbstractColumn {
         super.setColumnWriterBuffer(buffer);
 
         for (IColumn data : columnDataArray) {
-            data.setColumnWriterBuffer(factory.getBuffer(data.isUseSysBuffer()));
+            data.setColumnWriterBuffer(factory.getBuffer(data));
         }
     }
 

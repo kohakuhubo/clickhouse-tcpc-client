@@ -1,3 +1,8 @@
+/**
+ * ClickHouse数据块类
+ * 是数据传输和处理的核心组件，代表ClickHouse数据的容器
+ * 用于在客户端和服务器之间传输数据，支持序列化和反序列化
+ */
 package com.berry.clickhouse.tcp.client.data;
 
 import com.berry.clickhouse.tcp.client.buffer.EmptyReadWriter;
@@ -17,25 +22,53 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 数据块类
+ * 表示ClickHouse中的一个数据块，包含列和行的集合
+ * 支持数据的读写、序列化和反序列化
+ */
 public class Block {
 
+    /**
+     * 服务器上下文信息
+     */
     private NativeContext.ServerContext serverContext;
 
+    /**
+     * 列名到列对象的映射
+     */
     private Map<String, IColumn> columnMap;
 
+    /**
+     * 数据块的模式（读模式或写模式）
+     */
     private BlockDataModel model;
 
+    /**
+     * 是否序列化列数据
+     */
     private boolean serializeCols;
 
+    /**
+     * 表元数据信息
+     */
     private ClickHouseTableMetaData tableMetaData;
 
+    /**
+     * 从列数组创建数据块
+     * 
+     * @param columns 列数组
+     * @param serverContext 服务器上下文
+     * @return 创建的数据块
+     * @throws SQLException 如果创建过程中发生错误
+     */
     public static Block createFrom(IColumn[] columns, NativeContext.ServerContext serverContext) throws SQLException {
         Map<String, IColumn> columnMap = new HashMap<>(columns.length);
         ColumnWriterBufferFactory factory = serverContext.getColumnWriterBufferFactory();
         for (int i = 0; i < columns.length; i++) {
             IColumn column = columns[i];
             if (null == column.getColumnWriterBuffer()) {
-                column.setColumnWriterBuffer(factory.getBuffer(column.isUseSysBuffer()));
+                column.setColumnWriterBuffer(factory.getBuffer(column));
             }
             columnMap.put(column.name(), column);
         }
@@ -43,6 +76,14 @@ public class Block {
                 , columnMap, BlockDataModel.WRITE, false, null);
     }
 
+    /**
+     * 从表元数据创建数据块
+     * 
+     * @param metaData 表元数据
+     * @param serverContext 服务器上下文
+     * @return 创建的数据块
+     * @throws SQLException 如果创建过程中发生错误
+     */
     public static Block createFrom(ClickHouseTableMetaData metaData, NativeContext.ServerContext serverContext) throws SQLException {
         List<String> names = metaData.getColumnNames();
         byte[][] namesBytes = metaData.getColNameBytes();
@@ -56,9 +97,8 @@ public class Block {
         for (int i = 0; i < columnCnt; i++) {
             IDataType<?> dataType = DataTypeFactory.get(types.get(i), serverContext);
             String columnName = names.get(i);
-            IColumn column = ColumnFactory.createColumn(names.get(i), dataType, namesBytes[i], null,
-                    isUserSysBuffer(metaData.getSystemBufferColumns(), columnName, dataType));
-            column.setColumnWriterBuffer(factory.getBuffer(column.isUseSysBuffer()));
+            IColumn column = ColumnFactory.createColumn(names.get(i), dataType, namesBytes[i], null);
+            column.setColumnWriterBuffer(factory.getBuffer(column));
             columns[i] = column;
             columnMap.put(columnName, column);
         }
@@ -66,14 +106,18 @@ public class Block {
                 , columnMap, BlockDataModel.WRITE, false, metaData);
     }
 
-    private static boolean isUserSysBuffer(Set<String> systemBufferColumns, String columnName, IDataType<?> dataType) {
-        if (CollectionUtil.isNotEmpty(systemBufferColumns) && systemBufferColumns.contains(columnName)) {
-            return true;
-        } else {
-            return !dataType.isFixedLength();
-        }
-    }
-
+    /**
+     * 从二进制流读取并解压数据到数据块
+     * 
+     * @param deserializer 二进制反序列化器
+     * @param block 目标数据块
+     * @param reserveDiffType 是否保留不同类型
+     * @param exclude 排除的列名集合
+     * @param serializeCols 需要序列化的列名集合
+     * @return 读取的行数
+     * @throws IOException 如果读取过程中发生I/O错误
+     * @throws SQLException 如果读取过程中发生SQL错误
+     */
     public static int readAndDecompressFrom(BinaryDeserializer deserializer, Block block, boolean reserveDiffType,
                                             Set<String> exclude, Set<String> serializeCols) throws IOException, SQLException {
         deserializer.maybeEnableCompressed();
@@ -155,9 +199,9 @@ public class Block {
                 String name = deserializer.readUTF8StringBinary();
                 String type = deserializer.readUTF8StringBinary();
                 IDataType<?> dataType = DataTypeFactory.get(type, serverContext);
-                IColumn column = ColumnFactory.createColumn(name, dataType, BinarySerializerUtil.serializeString(name), null, !dataType.isFixedLength());
+                IColumn column = ColumnFactory.createColumn(name, dataType, BinarySerializerUtil.serializeString(name), null);
                 if (rowCnt > 0) {
-                    column.setColumnWriterBuffer(factory.getBuffer(column.isUseSysBuffer()));
+                    column.setColumnWriterBuffer(factory.getBuffer(column));
                     column.read(rowCnt, deserializer);
                     column.addRowCnt(rowCnt);
 
@@ -174,7 +218,7 @@ public class Block {
                 if (rowCnt > 0) {
                     arr = dataType.deserializeBinaryBulk(rowCnt, deserializer);
                 }
-                IColumn column = ColumnFactory.createColumn(name, dataType, BinarySerializerUtil.serializeString(name), arr, false);
+                IColumn column = ColumnFactory.createColumn(name, dataType, BinarySerializerUtil.serializeString(name), arr);
                 columns[i] = column;
                 column.addRowCnt(rowCnt);
                 columnMap.put(columns[i].name(), column);
@@ -247,6 +291,11 @@ public class Block {
         return tmpRowsCnt;
     }
 
+    /**
+     * 添加一行数据
+     * 
+     * @throws SQLException 如果添加失败
+     */
     public void appendRow() throws SQLException {
         int i = 0;
         try {
@@ -273,6 +322,13 @@ public class Block {
         }
     }
 
+    /**
+     * 将数据块写入二进制序列化器
+     * 
+     * @param serializer 二进制序列化器
+     * @throws IOException 如果写入过程中发生I/O错误
+     * @throws SQLException 如果写入过程中发生SQL错误
+     */
     public void writeTo(BinarySerializer serializer) throws IOException, SQLException {
         settings.writeTo(serializer);
 
@@ -285,6 +341,13 @@ public class Block {
         }
     }
 
+    /**
+     * 获取指定索引的列
+     * 
+     * @param columnIdx 列索引
+     * @return 列对象
+     * @throws SQLException 如果列索引无效
+     */
     public IColumn getColumn(int columnIdx) throws SQLException {
         Validate.isTrue(columnIdx < columns.length,
                 "Position " + columnIdx +
@@ -304,6 +367,9 @@ public class Block {
         return rowData[columnIdx];
     }
 
+    /**
+     * 初始化写入缓冲区
+     */
     public void initWriteBuffer() {
         ColumnWriterBufferFactory bufferFactory = this.serverContext.getColumnWriterBufferFactory();
         for (IColumn column : columns) {
@@ -312,7 +378,7 @@ public class Block {
             if (writeBuffer != null) {
                 bufferFactory.recycleBuffer(writeBuffer);
             }
-            column.setColumnWriterBuffer(bufferFactory.getBuffer(column.isUseSysBuffer()));
+            column.setColumnWriterBuffer(bufferFactory.getBuffer(column));
         }
     }
 
@@ -331,6 +397,9 @@ public class Block {
         return column.values();
     }
 
+    /**
+     * 清理数据块资源
+     */
     public void cleanup(int[] columnNums) {
         if (null == this.serverContext || null == columns || null == columnNums || columnNums.length == 0) {
             return;
@@ -384,6 +453,9 @@ public class Block {
         }
     }
 
+    /**
+     * 清理数据块资源
+     */
     public void cleanup() {
 
         if (null == columns) {
@@ -402,6 +474,9 @@ public class Block {
         this.columnMap.clear();
     }
 
+    /**
+     * 清理数据块数据
+     */
     public void cleanData() {
         if (null == columns) {
             return;
@@ -415,6 +490,9 @@ public class Block {
 
     }
 
+    /**
+     * 回滚数据块操作
+     */
     public void rollback() {
         if (null == columns) {
             return;
@@ -428,6 +506,9 @@ public class Block {
         }
     }
 
+    /**
+     * 重置数据块位置
+     */
     public void rewind() {
         this.model = BlockDataModel.READ;
         int tmpRowsCnt = -1;

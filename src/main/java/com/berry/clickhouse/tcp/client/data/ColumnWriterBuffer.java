@@ -1,11 +1,14 @@
 package com.berry.clickhouse.tcp.client.data;
 
+import com.berry.clickhouse.tcp.client.buffer.BufferPoolManager;
 import com.berry.clickhouse.tcp.client.buffer.ByteArrayWriter;
 import com.berry.clickhouse.tcp.client.serde.BinarySerializer;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Queue;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class ColumnWriterBuffer {
 
@@ -13,12 +16,12 @@ public class ColumnWriterBuffer {
 
     public final BinarySerializer column;
 
-    private final boolean isUseSysColumnWriterBuffer;
+    public final ColumnWriterBufferPoolManager manager;
 
-    public ColumnWriterBuffer(int size, int length, Queue<ByteBuffer> systemByteBufferQueue) {
-        this.isUseSysColumnWriterBuffer = (null != systemByteBufferQueue);
-        this.columnWriter = new ByteArrayWriter(size, length, systemByteBufferQueue);
+    public ColumnWriterBuffer(ColumnWriterBufferPoolManager manager, int length, Supplier<ByteBuffer> allocateBuffer, Consumer<ByteBuffer> recycleBuffer) {
+        this.columnWriter = new ByteArrayWriter(length, allocateBuffer, recycleBuffer);
         this.column = new BinarySerializer(columnWriter, false);
+        this.manager = manager;
     }
 
     public void writeTo(BinarySerializer serializer) throws IOException {
@@ -40,7 +43,7 @@ public class ColumnWriterBuffer {
         columnWriter.rewind();
     }
 
-    public boolean isUseSysColumnWriterBuffer() {
-        return isUseSysColumnWriterBuffer;
+    public ColumnWriterBufferPoolManager getManager() {
+        return manager;
     }
 }

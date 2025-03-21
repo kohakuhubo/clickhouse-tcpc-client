@@ -14,10 +14,10 @@ public class ColumnArray extends AbstractColumn {
     private final List<Long> offsets;
     private final IColumn data;
 
-    public ColumnArray(String name, DataTypeArray type, byte[] nameBytes, Object[] values, boolean useSystemBuffer) {
-        super(name, type, nameBytes, values, useSystemBuffer);
+    public ColumnArray(String name, DataTypeArray type, byte[] nameBytes, Object[] values) {
+        super(name, type, nameBytes, values);
         offsets = new ArrayList<>();
-        data = ColumnFactory.createColumn(null, type.getElemDataType(), nameBytes, null, useSystemBuffer);
+        data = ColumnFactory.createColumn(null, type.getElemDataType(), nameBytes, null);
     }
 
     @Override
