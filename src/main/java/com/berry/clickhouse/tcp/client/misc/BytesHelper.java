@@ -1,11 +1,21 @@
 package com.berry.clickhouse.tcp.client.misc;
 
+/**
+ * BytesHelper接口提供了一些用于字节操作的默认方法
+ * 包括字节数组的获取和设置
+ */
 public interface BytesHelper {
 
+    /**
+     * 获取整数的字节数组
+     * 
+     * @param i 整数
+     * @return 字节数组
+     */
     default byte[] getBytes(int i) {
         byte[] memory = new byte[Integer.BYTES];
         setInt(memory, 0, i);
-        return memory;
+        return memory; // 返回整数的字节数组
     }
 
     default byte[] getBytesLE(int i) {

@@ -2,12 +2,16 @@ package com.berry.clickhouse.tcp.client.settings;
 
 import java.util.Locale;
 
+/**
+ * ClickHouseErrCode枚举定义了ClickHouse的错误代码
+ * 包括各种错误类型及其描述
+ */
 public enum ClickHouseErrCode {
-    UNKNOWN_ERROR(-2, "UNKNOWN_ERROR"),
-    CLIENT_ERROR(-1, "CLIENT_ERROR"),
-    OK(0, "OK"),
-    UNSUPPORTED_METHOD(1, "UNSUPPORTED_METHOD"),
-    UNSUPPORTED_PARAMETER(2, "UNSUPPORTED_PARAMETER"),
+    UNKNOWN_ERROR(-2, "UNKNOWN_ERROR"), // 未知错误
+    CLIENT_ERROR(-1, "CLIENT_ERROR"), // 客户端错误
+    OK(0, "OK"), // 成功
+    UNSUPPORTED_METHOD(1, "UNSUPPORTED_METHOD"), // 不支持的方法
+    UNSUPPORTED_PARAMETER(2, "UNSUPPORTED_PARAMETER"), // 不支持的参数
     UNEXPECTED_END_OF_FILE(3, "UNEXPECTED_END_OF_FILE"),
     EXPECTED_END_OF_FILE(4, "EXPECTED_END_OF_FILE"),
     CANNOT_PARSE_TEXT(6, "CANNOT_PARSE_TEXT"),
@@ -533,28 +537,34 @@ public enum ClickHouseErrCode {
     UNKNOWN_EXCEPTION(1002, "UNKNOWN_EXCEPTION"),
     INVALID_SHARD_ID(1003, "INVALID_SHARD_ID");
 
+    /**
+     * 根据错误代码获取对应的ClickHouseErrCode
+     * 
+     * @param code 错误代码
+     * @return 对应的ClickHouseErrCode
+     */
     public static ClickHouseErrCode fromCode(int code) {
         for (ClickHouseErrCode value : ClickHouseErrCode.values()) {
             if (value.code == code)
-                return value;
+                return value; // 返回对应的错误代码
         }
-        return ClickHouseErrCode.UNKNOWN_ERROR;
+        return ClickHouseErrCode.UNKNOWN_ERROR; // 返回未知错误
     }
 
-    private final int code;
-    private final String name;
+    private final int code; // 错误代码
+    private final String name; // 错误名称
 
     ClickHouseErrCode(int code, String name) {
         this.code = code;
-        this.name = name;
+        this.name = name; // 初始化错误代码和名称
     }
 
     public int code() {
-        return code;
+        return code; // 返回错误代码
     }
 
     @Override
     public String toString() {
-        return String.format(Locale.ROOT, "[%s] %s", code, name);
+        return String.format(Locale.ROOT, "[%s] %s", code, name); // 返回错误的字符串表示
     }
 }

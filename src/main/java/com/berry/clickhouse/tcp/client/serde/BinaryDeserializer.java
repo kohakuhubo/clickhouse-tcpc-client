@@ -58,10 +58,10 @@ public class BinaryDeserializer {
             long valueChunk = currentByte & 0x7F;
             result |= (valueChunk << (7 * i));
             if ((currentByte & 0x80) == 0) {
-                return result;
+                return result; // 如果没有更多数据，返回结果
             }
         }
-        throw new IOException("Malformed VarInt: too long");
+        throw new IOException("Malformed VarInt: too long"); // 抛出异常
     }
 
     /**
@@ -73,7 +73,7 @@ public class BinaryDeserializer {
     @SuppressWarnings("PointlessBitwiseExpression")
     public short readShort() throws IOException {
         return (short) (((switcher.get().readBinary() & 0xFF) << 0)
-                      + ((switcher.get().readBinary() & 0xFF) << 8));
+                      + ((switcher.get().readBinary() & 0xFF) << 8)); // 读取短整数
     }
 
     /**
@@ -88,7 +88,7 @@ public class BinaryDeserializer {
         return ((switcher.get().readBinary() & 0xFF) << 0)
              + ((switcher.get().readBinary() & 0xFF) << 8)
              + ((switcher.get().readBinary() & 0xFF) << 16)
-             + ((switcher.get().readBinary() & 0xFF) << 24);
+             + ((switcher.get().readBinary() & 0xFF) << 24); // 读取整数
         // @formatter:on
     }
 
@@ -108,7 +108,7 @@ public class BinaryDeserializer {
              + ((switcher.get().readBinary() & 0xFFL) << 32)
              + ((switcher.get().readBinary() & 0xFFL) << 40)
              + ((switcher.get().readBinary() & 0xFFL) << 48)
-             + ((switcher.get().readBinary() & 0xFFL) << 56);
+             + ((switcher.get().readBinary() & 0xFFL) << 56); // 读取长整数
         // @formatter:on
     }
 
@@ -119,7 +119,7 @@ public class BinaryDeserializer {
      * @throws IOException 如果读取失败
      */
     public boolean readBoolean() throws IOException {
-        return (switcher.get().readBinary() != 0);
+        return (switcher.get().readBinary() != 0); // 读取布尔值
     }
 
     /**
@@ -129,8 +129,8 @@ public class BinaryDeserializer {
      * @throws IOException 如果读取失败
      */
     public byte[] readBytesBinary() throws IOException {
-        byte[] data = new byte[(int) readVarInt()];
-        switcher.get().readBinary(data);
+        byte[] data = new byte[(int) readVarInt()]; // 读取字节数组长度
+        switcher.get().readBinary(data); // 读取字节数组
         return data;
     }
 
@@ -141,8 +141,8 @@ public class BinaryDeserializer {
      * @throws IOException 如果读取失败
      */
     public String readUTF8StringBinary() throws IOException {
-        byte[] data = new byte[(int) readVarInt()];
-        return switcher.get().readBinary(data) > 0 ? new String(data, StandardCharsets.UTF_8) : "";
+        byte[] data = new byte[(int) readVarInt()]; // 读取字符串长度
+        return switcher.get().readBinary(data) > 0 ? new String(data, StandardCharsets.UTF_8) : ""; // 返回字符串
     }
 
     /**
@@ -152,7 +152,7 @@ public class BinaryDeserializer {
      * @throws IOException 如果读取失败
      */
     public byte readByte() throws IOException {
-        return (byte) switcher.get().readBinary();
+        return (byte) switcher.get().readBinary(); // 读取字节
     }
 
     /**
@@ -160,7 +160,7 @@ public class BinaryDeserializer {
      */
     public void maybeEnableCompressed() {
         if (enableCompress) {
-            switcher.select(true);
+            switcher.select(true); // 启用压缩
         }
     }
 
@@ -169,7 +169,7 @@ public class BinaryDeserializer {
      */
     public void maybeDisableCompressed() {
         if (enableCompress) {
-            switcher.select(false);
+            switcher.select(false); // 禁用压缩
         }
     }
 
@@ -185,9 +185,9 @@ public class BinaryDeserializer {
         int i = ((switcher.get().readBinary() & 0xFF) << 0)
               + ((switcher.get().readBinary() & 0xFF) << 8)
               + ((switcher.get().readBinary() & 0xFF) << 16)
-              + ((switcher.get().readBinary() & 0xFF) << 24);
+              + ((switcher.get().readBinary() & 0xFF) << 24); // 读取浮点数
         // @formatter:on
-        return Float.intBitsToFloat(i);
+        return Float.intBitsToFloat(i); // 转换为浮点数
     }
 
     /**
@@ -206,9 +206,9 @@ public class BinaryDeserializer {
                + ((switcher.get().readBinary() & 0xFFL) << 32)
                + ((switcher.get().readBinary() & 0xFFL) << 40)
                + ((switcher.get().readBinary() & 0xFFL) << 48)
-               + ((switcher.get().readBinary() & 0xFFL) << 56);
+               + ((switcher.get().readBinary() & 0xFFL) << 56); // 读取双精度浮点数
         // @formatter:on
-        return Double.longBitsToDouble(l);
+        return Double.longBitsToDouble(l); // 转换为双精度浮点数
     }
 
     /**
@@ -219,8 +219,8 @@ public class BinaryDeserializer {
      * @throws IOException 如果读取失败
      */
     public byte[] readBytes(int size) throws IOException {
-        byte[] bytes = new byte[size];
-        switcher.get().readBinary(bytes);
+        byte[] bytes = new byte[size]; // 创建字节数组
+        switcher.get().readBinary(bytes); // 读取字节数组
         return bytes;
     }
 }

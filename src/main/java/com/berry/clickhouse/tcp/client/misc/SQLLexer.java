@@ -2,19 +2,39 @@ package com.berry.clickhouse.tcp.client.misc;
 
 import java.sql.SQLException;
 
+/**
+ * SQLLexer类用于解析SQL语句
+ * 提供了对SQL语句中不同类型的字面量的解析功能
+ */
 public class SQLLexer {
-    private int pos;
-    private final String data;
+    private int pos; // 当前解析位置
+    private final String data; // SQL语句
 
+    /**
+     * 构造函数，初始化SQLLexer
+     * 
+     * @param pos 初始位置
+     * @param data SQL语句
+     */
     public SQLLexer(int pos, String data) {
         this.pos = pos;
         this.data = data;
     }
 
+    /**
+     * 获取当前字符并移动到下一个字符
+     * 
+     * @return 当前字符
+     */
     public char character() {
         return eof() ? 0 : data.charAt(pos++);
     }
 
+    /**
+     * 解析整数字面量
+     * 
+     * @return 解析得到的整数
+     */
     public int intLiteral() {
         skipAnyWhitespace();
 
@@ -30,17 +50,20 @@ public class SQLLexer {
         return Integer.parseInt(new StringView(data, start, pos).toString());
     }
 
+    /**
+     * 解析数字字面量
+     * 
+     * @return 解析得到的数字
+     */
     public Number numberLiteral() {
         skipAnyWhitespace();
 
         int start = pos;
-        // @formatter:off
-        boolean isHex       = false;
-        boolean isBinary    = false;
-        boolean isDouble    = false;
+        boolean isHex = false;
+        boolean isBinary = false;
+        boolean isDouble = false;
         boolean hasExponent = false;
-        boolean hasSigned   = false;
-        // @formatter:on
+        boolean hasSigned = false;
 
         if (isCharacter('-') || isCharacter('+')) {
             hasSigned = true;
@@ -48,14 +71,12 @@ public class SQLLexer {
         }
 
         if (pos + 2 < data.length()) {
-            // @formatter:off
             if (data.charAt(pos) == '0' && (data.charAt(pos + 1) == 'x' || data.charAt(pos + 1) == 'X'
-                                         || data.charAt(pos + 1) == 'b' || data.charAt(pos + 1) == 'B')) {
-                isHex    = data.charAt(pos + 1) == 'x' || data.charAt(pos + 1) == 'X';
+                    || data.charAt(pos + 1) == 'b' || data.charAt(pos + 1) == 'B')) {
+                isHex = data.charAt(pos + 1) == 'x' || data.charAt(pos + 1) == 'X';
                 isBinary = data.charAt(pos + 1) == 'b' || data.charAt(pos + 1) == 'B';
                 pos += 2;
             }
-            // @formatter:on
         }
 
         for (; pos < data.length(); pos++) {
@@ -73,10 +94,8 @@ public class SQLLexer {
         }
 
         if (pos + 1 < data.length()
-                // @formatter:off
                 && (isHex ? (data.charAt(pos) == 'p' || data.charAt(pos) == 'P')
-                          : (data.charAt(pos) == 'e' || data.charAt(pos) == 'E'))) {
-                // @formatter:on
+                        : (data.charAt(pos) == 'e' || data.charAt(pos) == 'E'))) {
             hasExponent = true;
             pos++;
 
@@ -107,50 +126,82 @@ public class SQLLexer {
         }
     }
 
+    /**
+     * 解析字符串字面量
+     * 
+     * @return 解析得到的字符串
+     * @throws SQLException 如果解析失败
+     */
     public String stringLiteral() throws SQLException {
         return stringView().toString();
     }
 
+    /**
+     * 获取字符串视图
+     * 
+     * @return 字符串视图
+     * @throws SQLException 如果解析失败
+     */
     public StringView stringView() throws SQLException {
         skipAnyWhitespace();
         Validate.isTrue(isCharacter('\''));
         return stringLiteralWithQuoted('\'');
     }
 
+    /**
+     * 检查是否到达文件末尾
+     * 
+     * @return 如果到达文件末尾则返回true
+     */
     public boolean eof() {
         skipAnyWhitespace();
         return pos >= data.length();
     }
 
+    /**
+     * 检查当前字符是否与给定字符相同
+     * 
+     * @param ch 要检查的字符
+     * @return 如果相同则返回true
+     */
     public boolean isCharacter(char ch) {
         return !eof() && data.charAt(pos) == ch;
     }
 
+    /**
+     * 获取裸单词
+     * 
+     * @return 字符串视图
+     * @throws SQLException 如果解析失败
+     */
     public StringView bareWord() throws SQLException {
         skipAnyWhitespace();
-        // @formatter:off
         if (isCharacter('`')) {
             return stringLiteralWithQuoted('`');
         } else if (isCharacter('"')) {
             return stringLiteralWithQuoted('"');
         } else if (data.charAt(pos) == '_'
-               || (data.charAt(pos) >= 'a' && data.charAt(pos) <= 'z')
-               || (data.charAt(pos) >= 'A' && data.charAt(pos) <= 'Z')) {
+                || (data.charAt(pos) >= 'a' && data.charAt(pos) <= 'z')
+                || (data.charAt(pos) >= 'A' && data.charAt(pos) <= 'Z')) {
             int start = pos;
             for (pos++; pos < data.length(); pos++) {
                 if (!('_' == data.charAt(pos)
-                  || (data.charAt(pos) >= 'a' && data.charAt(pos) <= 'z')
-                  || (data.charAt(pos) >= 'A' && data.charAt(pos) <= 'Z')
-                  || (data.charAt(pos) >= '0' && data.charAt(pos) <= '9'))) {
+                        || (data.charAt(pos) >= 'a' && data.charAt(pos) <= 'z')
+                        || (data.charAt(pos) >= 'A' && data.charAt(pos) <= 'Z')
+                        || (data.charAt(pos) >= '0' && data.charAt(pos) <= '9'))) {
                     break;
                 }
             }
             return new StringView(data, start, pos);
         }
-        // @formatter:on
         throw new SQLException("Expect Bare Token.");
     }
 
+    /**
+     * 检查当前字符是否为空白字符
+     * 
+     * @return 如果是空白字符则返回true
+     */
     public boolean isWhitespace() {
         return data.charAt(pos++) == ' ';
     }
@@ -165,15 +216,13 @@ public class SQLLexer {
 
     private void skipAnyWhitespace() {
         for (; pos < data.length(); pos++) {
-            // @formatter:off
             if (data.charAt(pos) != ' '
-             && data.charAt(pos) != '\t'
-             && data.charAt(pos) != '\n'
-             && data.charAt(pos) != '\r'
-             && data.charAt(pos) != '\f') {
+                    && data.charAt(pos) != '\t'
+                    && data.charAt(pos) != '\n'
+                    && data.charAt(pos) != '\r'
+                    && data.charAt(pos) != '\f') {
                 return;
             }
-            // @formatter:on
         }
     }
 

@@ -3,20 +3,38 @@ package com.berry.clickhouse.tcp.client.log;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * MessageFormatter类用于格式化日志消息
+ * 提供了多种格式化方法以支持不同的日志记录需求
+ */
 final public class MessageFormatter {
-    static final char DELIM_START = '{';
-    static final char DELIM_STOP = '}';
-    static final String DELIM_STR = "{}";
-    private static final char ESCAPE_CHAR = '\\';
+    static final char DELIM_START = '{'; // 格式化开始标记
+    static final char DELIM_STOP = '}'; // 格式化结束标记
+    static final String DELIM_STR = "{}"; // 格式化占位符
+    private static final char ESCAPE_CHAR = '\\'; // 转义字符
 
+    /**
+     * 格式化单个参数的日志消息
+     * 
+     * @param messagePattern 日志消息模式
+     * @param arg 参数
+     * @return 格式化后的元组
+     */
     public static FormattingTuple format(String messagePattern, Object arg) {
         return arrayFormat(messagePattern, new Object[] { arg });
     }
 
+    /**
+     * 格式化两个参数的日志消息
+     * 
+     * @param messagePattern 日志消息模式
+     * @param arg1 第一个参数
+     * @param arg2 第二个参数
+     * @return 格式化后的元组
+     */
     public static FormattingTuple format(final String messagePattern, Object arg1, Object arg2) {
         return arrayFormat(messagePattern, new Object[] { arg1, arg2 });
     }
-
 
     static Throwable getThrowableCandidate(Object[] argArray) {
         if (argArray == null || argArray.length == 0) {

@@ -1,7 +1,12 @@
 package com.berry.clickhouse.tcp.client.buffer;
 
 import java.io.IOException;
+import java.io.InputStream;
 
+/**
+ * BuffedReader类用于从输入流中读取数据
+ * 提供缓冲读取功能以提高读取效率
+ */
 public interface BuffedReader {
 
     int readBinary() throws IOException;

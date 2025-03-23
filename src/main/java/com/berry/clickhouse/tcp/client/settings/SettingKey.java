@@ -11,19 +11,25 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * SettingKey类定义了ClickHouse配置的各种设置键
+ * 包括设置的名称、类型、描述和默认值
+ */
 public class SettingKey implements Serializable {
-    private static final Map<String, SettingKey> DEFINED_SETTING_KEYS = new ConcurrentHashMap<>();
+    private static final Map<String, SettingKey> DEFINED_SETTING_KEYS = new ConcurrentHashMap<>(); // 存储已定义的设置键
 
     public static SettingKey min_compress_block_size = SettingKey.builder()
             .withName("min_compress_block_size")
             .withType(SettingType.Int64)
-            .withDescription("The actual size of the block to compress, if the uncompressed data less than max_compress_block_size is no less than this value and no less than the volume of data for one mark.")
+            .withDescription("Minimum size of block to compress")
+            .withDefaultValue(8192L)
             .build();
 
     public static SettingKey max_compress_block_size = SettingKey.builder()
             .withName("max_compress_block_size")
             .withType(SettingType.Int64)
-            .withDescription("The maximum size of blocks of uncompressed data before compressing for writing to a table.")
+            .withDescription("Maximum size of block to compress")
+            .withDefaultValue(1048576L)
             .build();
 
     public static SettingKey max_block_size = SettingKey.builder()
@@ -900,22 +906,47 @@ public class SettingKey implements Serializable {
         this.isSecret = isSecret;
     }
 
+    /**
+     * 获取设置键的名称
+     * 
+     * @return 设置键的名称
+     */
     public String name() {
         return name;
     }
 
+    /**
+     * 获取设置键的描述
+     * 
+     * @return 设置键的描述
+     */
     public String description() {
         return description;
     }
 
+    /**
+     * 获取设置键的类型
+     * 
+     * @return 设置键的类型
+     */
     public SettingType<?> type() {
         return type;
     }
 
+    /**
+     * 获取设置键的默认值
+     * 
+     * @return 设置键的默认值
+     */
     public Object defaultValue() {
         return defaultValue;
     }
 
+    /**
+     * 检查设置键是否为秘密
+     * 
+     * @return 如果是秘密则返回true
+     */
     public boolean isSecret() {
         return isSecret;
     }

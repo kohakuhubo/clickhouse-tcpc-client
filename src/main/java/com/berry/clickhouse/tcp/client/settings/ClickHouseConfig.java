@@ -15,30 +15,58 @@ import java.util.*;
 
 import static com.berry.clickhouse.tcp.client.jdbc.ClickhousePropertiesParser.HOST_DELIMITER;
 
+/**
+ * ClickHouseConfig类用于配置ClickHouse连接的各种参数
+ * 包括主机、端口、数据库、用户凭证等设置
+ */
 public class ClickHouseConfig implements Serializable {
 
-    private final String host;
-    private final List<String> hosts;
-    private final int port;
-    private final String database;
-    private final String user;
-    private final String password;
-    private final Duration queryTimeout;
-    private final Duration connectTimeout;
-    private final String charset;
-    private final Map<SettingKey, Serializable> settings;
-    private final boolean tcpKeepAlive;
-    private final boolean ssl;
-    private final String sslMode;
-    private final String clientName;
-    private final int connectionPoolMaxIdle;
-    private final int connectionPoolMinIdle;
-    private final int connectionPoolTotal;
-    private final String serializedIPv4;
-    private final String serializedIPv6;
-    private final ColumnWriterBufferPoolManager columnWriterBufferPoolManager;
-    private final BufferPoolManager bufferPoolManager;
+    private final String host; // 主机名
+    private final List<String> hosts; // 主机列表
+    private final int port; // 端口号
+    private final String database; // 数据库名
+    private final String user; // 用户名
+    private final String password; // 密码
+    private final Duration queryTimeout; // 查询超时时间
+    private final Duration connectTimeout; // 连接超时时间
+    private final String charset; // 字符集
+    private final Map<SettingKey, Serializable> settings; // 设置键值对
+    private final boolean tcpKeepAlive; // TCP保持活动
+    private final boolean ssl; // 是否启用SSL
+    private final String sslMode; // SSL模式
+    private final String clientName; // 客户端名称
+    private final int connectionPoolMaxIdle; // 连接池最大空闲连接数
+    private final int connectionPoolMinIdle; // 连接池最小空闲连接数
+    private final int connectionPoolTotal; // 连接池总连接数
+    private final String serializedIPv4; // 序列化的IPv4地址
+    private final String serializedIPv6; // 序列化的IPv6地址
+    private final ColumnWriterBufferPoolManager columnWriterBufferPoolManager; // 列写入缓冲池管理器
+    private final BufferPoolManager bufferPoolManager; // 缓冲池管理器
 
+    /**
+     * ClickHouseConfig构造函数
+     * 
+     * @param host 主机名
+     * @param port 端口号
+     * @param database 数据库名
+     * @param user 用户名
+     * @param password 密码
+     * @param queryTimeout 查询超时时间
+     * @param connectTimeout 连接超时时间
+     * @param tcpKeepAlive TCP保持活动
+     * @param ssl 是否启用SSL
+     * @param sslMode SSL模式
+     * @param charset 字符集
+     * @param clientName 客户端名称
+     * @param settings 设置键值对
+     * @param connectionPoolMaxIdle 连接池最大空闲连接数
+     * @param connectionPoolMinIdle 连接池最小空闲连接数
+     * @param connectionPoolTotal 连接池总连接数
+     * @param serializedIPv4 序列化的IPv4地址
+     * @param serializedIPv6 序列化的IPv6地址
+     * @param columnWriterBufferPoolManager 列写入缓冲池管理器
+     * @param bufferPoolManager 缓冲池管理器
+     */
     private ClickHouseConfig(String host, int port, String database, String user, String password,
                              Duration queryTimeout, Duration connectTimeout, boolean tcpKeepAlive,
                              boolean ssl, String sslMode, String charset, String clientName,
@@ -73,210 +101,214 @@ public class ClickHouseConfig implements Serializable {
         this.columnWriterBufferPoolManager = columnWriterBufferPoolManager;
     }
 
+    // 各种getter方法
     public String host() {
-        return this.host;
+        return this.host; // 返回主机名
     }
 
     public List<String> hosts() {
-        return this.hosts;
+        return this.hosts; // 返回主机列表
     }
 
     public int port() {
-        return this.port;
+        return this.port; // 返回端口号
     }
 
     public String database() {
-        return this.database;
+        return this.database; // 返回数据库名
     }
 
     public String user() {
-        return this.user;
+        return this.user; // 返回用户名
     }
 
     public String password() {
-        return this.password;
+        return this.password; // 返回密码
     }
 
     public Duration queryTimeout() {
-        return this.queryTimeout;
+        return this.queryTimeout; // 返回查询超时时间
     }
 
     public Duration connectTimeout() {
-        return this.connectTimeout;
+        return this.connectTimeout; // 返回连接超时时间
     }
 
     public boolean ssl() {
-        return this.ssl;
+        return this.ssl; // 返回是否启用SSL
     }
 
     public String sslMode() {
-        return this.sslMode;
+        return this.sslMode; // 返回SSL模式
     }
 
     public Charset charset() {
-        return Charset.forName(charset);
+        return Charset.forName(charset); // 返回字符集
     }
 
     public String clientName() {
-        return this.clientName;
+        return this.clientName; // 返回客户端名称
     }
 
     public Map<SettingKey, Serializable> settings() {
-        return settings;
+        return settings; // 返回设置键值对
     }
 
+    // 各种配置方法
     public ClickHouseConfig withHostPort(String host, int port) {
         return Builder.builder(this)
                 .host(host)
                 .port(port)
-                .build();
+                .build(); // 更新主机和端口
     }
 
     public ClickHouseConfig withDatabase(String database) {
         return Builder.builder(this)
                 .database(database)
-                .build();
+                .build(); // 更新数据库名
     }
 
     public ClickHouseConfig withCredentials(String user, String password) {
         return Builder.builder(this)
                 .user(user)
                 .password(password)
-                .build();
+                .build(); // 更新用户名和密码
     }
 
     public ClickHouseConfig withQueryTimeout(Duration timeout) {
         return Builder.builder(this)
                 .queryTimeout(timeout)
-                .build();
+                .build(); // 更新查询超时时间
     }
 
     public ClickHouseConfig withTcpKeepAlive(boolean enable) {
         return Builder.builder(this)
                 .tcpKeepAlive(enable)
-                .build();
+                .build(); // 更新TCP保持活动设置
     }
 
     public ClickHouseConfig withSSL(boolean enable) {
         return Builder.builder(this)
                 .ssl(enable)
-                .build();
+                .build(); // 更新SSL设置
     }
 
     public ClickHouseConfig withSSLMode(String mode) {
         return Builder.builder(this)
                 .sslMode(mode)
-                .build();
+                .build(); // 更新SSL模式
     }
 
     public ClickHouseConfig withCharset(Charset charset) {
         return Builder.builder(this)
                 .charset(charset)
-                .build();
+                .build(); // 更新字符集
     }
 
     public ClickHouseConfig withClientName(String clientName) {
         return Builder.builder(this)
                 .clientName(clientName)
-                .build();
+                .build(); // 更新客户端名称
     }
 
     public ClickHouseConfig withSettings(Map<SettingKey, Serializable> settings) {
         return Builder.builder(this)
                 .withSettings(settings)
-                .build();
+                .build(); // 更新设置
     }
 
     public ClickHouseConfig withProperties(Properties properties) {
         return Builder.builder(this)
                 .withProperties(properties)
-                .build();
+                .build(); // 更新属性
     }
 
     public boolean tcpKeepAlive() {
-        return tcpKeepAlive;
+        return tcpKeepAlive; // 返回TCP保持活动设置
     }
 
+    // Builder类用于构建ClickHouseConfig实例
     public static final class Builder {
-        private String host;
-        private int port;
-        private String database;
-        private String user;
-        private String password;
-        private Duration connectTimeout;
-        private Duration queryTimeout;
-        private boolean tcpKeepAlive;
-        private boolean ssl;
-        private String sslMode;
-        private Charset charset;
-        private String clientName;
-        private int selfColumStackLength;
-        private int selfByteBufferSize;
-        private int selfByteBufferLength;
-        private int connectionPoolMaxIdle;
-        private int connectionPooMinIdle;
-        private int connectionPoolTotal;
-        private String serializedIPv4;
-        private String serializedIPv6;
-        private Map<SettingKey, Serializable> settings = new HashMap<>();
-        private BufferPoolManager bufferPoolManager;
-        private ColumnWriterBufferPoolManager columnWriterBufferPoolManager;
+        private String host; // 主机名
+        private int port; // 端口号
+        private String database; // 数据库名
+        private String user; // 用户名
+        private String password; // 密码
+        private Duration connectTimeout; // 连接超时时间
+        private Duration queryTimeout; // 查询超时时间
+        private boolean tcpKeepAlive; // TCP保持活动
+        private boolean ssl; // 是否启用SSL
+        private String sslMode; // SSL模式
+        private Charset charset; // 字符集
+        private String clientName; // 客户端名称
+        private int selfColumStackLength; // 列堆栈长度
+        private int selfByteBufferSize; // 字节缓冲区大小
+        private int selfByteBufferLength; // 字节缓冲区长度
+        private int connectionPoolMaxIdle; // 连接池最大空闲连接数
+        private int connectionPooMinIdle; // 连接池最小空闲连接数
+        private int connectionPoolTotal; // 连接池总连接数
+        private String serializedIPv4; // 序列化的IPv4地址
+        private String serializedIPv6; // 序列化的IPv6地址
+        private Map<SettingKey, Serializable> settings = new HashMap<>(); // 设置键值对
+        private BufferPoolManager bufferPoolManager; // 缓冲池管理器
+        private ColumnWriterBufferPoolManager columnWriterBufferPoolManager; // 列写入缓冲池管理器
 
         private Builder() {
         }
 
+        // 各种Builder方法
         public Builder serializedIPv6(String serializedIPv6) {
-            this.serializedIPv6 = serializedIPv6;
+            this.serializedIPv6 = serializedIPv6; // 设置序列化的IPv6地址
             return this;
         }
 
         public Builder serializedIPv4(String serializedIPv4) {
-            this.serializedIPv4 = serializedIPv4;
+            this.serializedIPv4 = serializedIPv4; // 设置序列化的IPv4地址
             return this;
         }
 
         public Builder connectionPoolTotal(int connectionPoolTotal) {
-            this.connectionPoolTotal = connectionPoolTotal;
+            this.connectionPoolTotal = connectionPoolTotal; // 设置连接池总连接数
             return this;
         }
 
         public Builder connectionPooMinIdle(int connectionPooMinIdle) {
-            this.connectionPooMinIdle = connectionPooMinIdle;
+            this.connectionPooMinIdle = connectionPooMinIdle; // 设置连接池最小空闲连接数
             return this;
         }
 
         public Builder connectionPoolMaxIdle(int connectionPoolMaxIdle) {
-            this.connectionPoolMaxIdle = connectionPoolMaxIdle;
+            this.connectionPoolMaxIdle = connectionPoolMaxIdle; // 设置连接池最大空闲连接数
             return this;
         }
 
         public Builder selfByteBufferLength(int selfByteBufferLength) {
-            this.selfByteBufferLength = selfByteBufferLength;
+            this.selfByteBufferLength = selfByteBufferLength; // 设置字节缓冲区长度
             return this;
         }
 
         public Builder selfByteBufferSize(int selfByteBufferSize) {
-            this.selfByteBufferSize = selfByteBufferSize;
+            this.selfByteBufferSize = selfByteBufferSize; // 设置字节缓冲区大小
             return this;
         }
 
         public Builder selfColumStackLength(int selfColumStackLength) {
-            this.selfColumStackLength = selfColumStackLength;
+            this.selfColumStackLength = selfColumStackLength; // 设置列堆栈长度
             return this;
         }
 
         public Builder bufferPoolManager(BufferPoolManager bufferPoolManager) {
-            this.bufferPoolManager = bufferPoolManager;
+            this.bufferPoolManager = bufferPoolManager; // 设置缓冲池管理器
             return this;
         }
 
         public Builder columnWriterBufferPoolManager(ColumnWriterBufferPoolManager columnWriterBufferPoolManager) {
-            this.columnWriterBufferPoolManager = columnWriterBufferPoolManager;
+            this.columnWriterBufferPoolManager = columnWriterBufferPoolManager; // 设置列写入缓冲池管理器
             return this;
         }
 
         public static Builder builder() {
-            return new Builder();
+            return new Builder(); // 创建新的Builder实例
         }
 
         public static Builder builder(ClickHouseConfig cfg) {
@@ -293,99 +325,100 @@ public class ClickHouseConfig implements Serializable {
                     .ssl(cfg.ssl())
                     .sslMode(cfg.sslMode())
                     .clientName(cfg.clientName())
-                    .withSettings(cfg.settings());
+                    .withSettings(cfg.settings()); // 从现有配置构建新的Builder
         }
 
         public Builder withSetting(SettingKey key, Serializable value) {
-            this.settings.put(key, value);
+            this.settings.put(key, value); // 添加设置
             return this;
         }
 
         public Builder withSettings(Map<SettingKey, Serializable> settings) {
-            CollectionUtil.mergeMapInPlaceKeepLast(this.settings, settings);
+            this.settings.putAll(settings); // 添加多个设置
             return this;
         }
 
         public Builder host(String host) {
-            this.withSetting(SettingKey.host, host);
+            this.withSetting(SettingKey.host, host); // 设置主机名
             return this;
         }
 
         public Builder port(int port) {
-            this.withSetting(SettingKey.port, port);
+            this.withSetting(SettingKey.port, port); // 设置端口号
             return this;
         }
 
         public Builder database(String database) {
-            this.withSetting(SettingKey.database, database);
+            this.withSetting(SettingKey.database, database); // 设置数据库名
             return this;
         }
 
         public Builder user(String user) {
-            this.withSetting(SettingKey.user, user);
+            this.withSetting(SettingKey.user, user); // 设置用户名
             return this;
         }
 
         public Builder password(String password) {
-            this.withSetting(SettingKey.password, password);
+            this.withSetting(SettingKey.password, password); // 设置密码
             return this;
         }
 
         public Builder connectTimeout(Duration connectTimeout) {
-            this.withSetting(SettingKey.connect_timeout, connectTimeout);
+            this.withSetting(SettingKey.connect_timeout, connectTimeout); // 设置连接超时时间
             return this;
         }
 
         public Builder queryTimeout(Duration queryTimeout) {
-            this.withSetting(SettingKey.query_timeout, queryTimeout);
+            this.withSetting(SettingKey.query_timeout, queryTimeout); // 设置查询超时时间
             return this;
         }
 
         public Builder tcpKeepAlive(boolean tcpKeepAlive) {
-            this.withSetting(SettingKey.tcp_keep_alive, tcpKeepAlive);
+            this.withSetting(SettingKey.tcp_keep_alive, tcpKeepAlive); // 设置TCP保持活动
             return this;
         }
 
         public Builder ssl(boolean ssl) {
-            this.withSetting(SettingKey.ssl, ssl);
+            this.withSetting(SettingKey.ssl, ssl); // 设置SSL
             return this;
         }
 
         public Builder sslMode(String sslMode) {
-            this.withSetting(SettingKey.ssl, ssl);
+            this.withSetting(SettingKey.sslMode, sslMode); // 设置SSL模式
             return this;
         }
 
         public Builder charset(String charset) {
-            this.withSetting(SettingKey.charset, charset);
+            this.withSetting(SettingKey.charset, charset); // 设置字符集
             return this;
         }
 
         public Builder charset(Charset charset) {
-            this.withSetting(SettingKey.charset, charset.name());
+            this.withSetting(SettingKey.charset, charset.name()); // 设置字符集
             return this;
         }
 
         public Builder clientName(String clientName) {
-            this.withSetting(SettingKey.client_name, clientName);
+            this.withSetting(SettingKey.client_name, clientName); // 设置客户端名称
             return this;
         }
 
         public Builder settings(Map<SettingKey, Serializable> settings) {
-            this.settings = settings;
+            this.settings = settings; // 设置键值对
             return this;
         }
 
         public Builder clearSettings() {
-            this.settings = new HashMap<>();
+            this.settings.clear(); // 清空设置
             return this;
         }
 
         public Builder withProperties(Properties properties) {
-            return this.withSettings(ClickhousePropertiesParser.parseProperties(properties));
+            return this.withSettings(ClickhousePropertiesParser.parseProperties(properties)); // 从属性中设置
         }
 
         public ClickHouseConfig build() {
+            // 构建ClickHouseConfig实例
             this.host = (String) this.settings.getOrDefault(SettingKey.host, "127.0.0.1");
             this.port = ((Number) this.settings.getOrDefault(SettingKey.port, 9000)).intValue();
             this.user = (String) this.settings.getOrDefault(SettingKey.user, "default");
@@ -415,6 +448,7 @@ public class ClickHouseConfig implements Serializable {
         }
 
         private void revisit() {
+            // 检查并设置默认值
             if (StrUtil.isBlank(this.host)) this.host = "127.0.0.1";
             if (this.port == -1) this.port = 9000;
             if (StrUtil.isBlank(this.user)) this.user = "default";
@@ -425,6 +459,7 @@ public class ClickHouseConfig implements Serializable {
         }
 
         private void purgeSettings() {
+            // 清除不必要的设置
             this.settings.remove(SettingKey.port);
             this.settings.remove(SettingKey.host);
             this.settings.remove(SettingKey.password);
@@ -440,31 +475,32 @@ public class ClickHouseConfig implements Serializable {
         }
     }
 
+    // 其他getter方法
     public int getConnectionPoolMaxIdle() {
-        return connectionPoolMaxIdle;
+        return connectionPoolMaxIdle; // 返回连接池最大空闲连接数
     }
 
     public int getConnectionPoolMinIdle() {
-        return connectionPoolMinIdle;
+        return connectionPoolMinIdle; // 返回连接池最小空闲连接数
     }
 
     public int getConnectionPoolTotal() {
-        return connectionPoolTotal;
+        return connectionPoolTotal; // 返回连接池总连接数
     }
 
     public String getSerializedIPv4() {
-        return serializedIPv4;
+        return serializedIPv4; // 返回序列化的IPv4地址
     }
 
     public String getSerializedIPv6() {
-        return serializedIPv6;
+        return serializedIPv6; // 返回序列化的IPv6地址
     }
 
     public ColumnWriterBufferPoolManager getColumnWriterBufferPoolManager() {
-        return columnWriterBufferPoolManager;
+        return columnWriterBufferPoolManager; // 返回列写入缓冲池管理器
     }
 
     public BufferPoolManager getBufferPoolManager() {
-        return bufferPoolManager;
+        return bufferPoolManager; // 返回缓冲池管理器
     }
 }

@@ -13,9 +13,21 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * DataTypeFactory类用于创建ClickHouse数据类型的实例
+ * 提供数据类型的缓存和解析功能
+ */
 public class DataTypeFactory {
     private static final LRUCache<String, IDataType<?>> DATA_TYPE_CACHE = new LRUCache<>(ClickHouseDefines.DATA_TYPE_CACHE_SIZE);
 
+    /**
+     * 根据数据类型名称获取对应的IDataType实例
+     * 
+     * @param type 数据类型名称
+     * @param serverContext 服务器上下文
+     * @return 对应的IDataType实例
+     * @throws SQLException 如果发生SQL错误
+     */
     public static IDataType<?> get(String type, NativeContext.ServerContext serverContext) throws SQLException {
         IDataType<?> dataType = DATA_TYPE_CACHE.get(type);
         if (dataType != null) {
@@ -33,6 +45,14 @@ public class DataTypeFactory {
 
     private static final Map<String, IDataType<?>> dataTypes = initialDataTypes();
 
+    /**
+     * 根据SQLLexer解析数据类型
+     * 
+     * @param lexer SQL词法分析器
+     * @param serverContext 服务器上下文
+     * @return 对应的IDataType实例
+     * @throws SQLException 如果发生SQL错误
+     */
     public static IDataType<?> get(SQLLexer lexer, NativeContext.ServerContext serverContext) throws SQLException {
         String dataTypeName = String.valueOf(lexer.bareWord());
 

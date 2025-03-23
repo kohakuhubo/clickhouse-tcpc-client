@@ -49,7 +49,7 @@ public class BinarySerializer {
             compressWriter = new CompressedBuffedWriter(ClickHouseDefines.SOCKET_SEND_BUFFER_BYTES, writer);
         }
         switcher = new Switcher<>(compressWriter, writer);
-        writeBuffer = new byte[8];
+        writeBuffer = new byte[8]; // 初始化写入缓冲区
     }
 
     /**
@@ -64,14 +64,14 @@ public class BinarySerializer {
             byte byt = (byte) (x & 0x7F);
 
             if (x > 0x7F) {
-                byt |= 0x80;
+                byt |= 0x80; // 设置高位标志
             }
 
-            x >>= 7;
-            switcher.get().writeBinary(byt);
+            x >>= 7; // 右移7位
+            switcher.get().writeBinary(byt); // 写入字节
 
             if (x == 0) {
-                return;
+                return; // 如果没有更多数据，退出
             }
         }
     }
@@ -83,7 +83,7 @@ public class BinarySerializer {
      * @throws IOException 如果写入失败
      */
     public void writeByte(byte x) throws IOException {
-        switcher.get().writeBinary(x);
+        switcher.get().writeBinary(x); // 写入字节
     }
 
     /**
@@ -93,7 +93,7 @@ public class BinarySerializer {
      * @throws IOException 如果写入失败
      */
     public void writeBoolean(boolean x) throws IOException {
-        writeVarInt((byte) (x ? 1 : 0));
+        writeVarInt((byte) (x ? 1 : 0)); // 将布尔值转换为整数并写入
     }
 
     /**
@@ -107,7 +107,7 @@ public class BinarySerializer {
         // @formatter:off
         writeBuffer[0] = (byte) ((i >> 0) & 0xFF);
         writeBuffer[1] = (byte) ((i >> 8) & 0xFF);
-        switcher.get().writeBinary(writeBuffer, 0, 2);
+        switcher.get().writeBinary(writeBuffer, 0, 2); // 写入短整数
         // @formatter:on
     }
 
@@ -124,7 +124,7 @@ public class BinarySerializer {
         writeBuffer[1] = (byte) ((i >> 8)  & 0xFF);
         writeBuffer[2] = (byte) ((i >> 16) & 0xFF);
         writeBuffer[3] = (byte) ((i >> 24) & 0xFF);
-        switcher.get().writeBinary(writeBuffer, 0, 4);
+        switcher.get().writeBinary(writeBuffer, 0, 4); // 写入整数
         // @formatter:on
     }
 
@@ -145,7 +145,7 @@ public class BinarySerializer {
         writeBuffer[5] = (byte) ((i >> 40) & 0xFF);
         writeBuffer[6] = (byte) ((i >> 48) & 0xFF);
         writeBuffer[7] = (byte) ((i >> 56) & 0xFF);
-        switcher.get().writeBinary(writeBuffer, 0, 8);
+        switcher.get().writeBinary(writeBuffer, 0, 8); // 写入长整数
         // @formatter:on
     }
 
@@ -156,7 +156,7 @@ public class BinarySerializer {
      * @throws IOException 如果写入失败
      */
     public void writeUTF8StringBinary(String utf8) throws IOException {
-        writeStringBinary(utf8, StandardCharsets.UTF_8);
+        writeStringBinary(utf8, StandardCharsets.UTF_8); // 写入UTF-8字符串
     }
 
     /**
@@ -167,8 +167,8 @@ public class BinarySerializer {
      * @throws IOException 如果写入失败
      */
     public void writeStringBinary(String data, Charset charset) throws IOException {
-        byte[] bs = data.getBytes(charset);
-        writeBytesBinary(bs);
+        byte[] bs = data.getBytes(charset); // 将字符串转换为字节数组
+        writeBytesBinary(bs); // 写入字节数组
     }
 
     /**
@@ -178,8 +178,8 @@ public class BinarySerializer {
      * @throws IOException 如果写入失败
      */
     public void writeBytesBinary(byte[] bs) throws IOException {
-        writeVarInt(bs.length);
-        switcher.get().writeBinary(bs, 0, bs.length);
+        writeVarInt(bs.length); // 写入字节数组长度
+        switcher.get().writeBinary(bs, 0, bs.length); // 写入字节数组
     }
 
     /**
@@ -189,7 +189,7 @@ public class BinarySerializer {
      * @throws IOException 如果刷新失败
      */
     public void flushToTarget(boolean force) throws IOException {
-        switcher.get().flushToTarget(force);
+        switcher.get().flushToTarget(force); // 刷新到目标流
     }
 
     /**
@@ -197,7 +197,7 @@ public class BinarySerializer {
      */
     public void maybeEnableCompressed() {
         if (enableCompress) {
-            switcher.select(true);
+            switcher.select(true); // 启用压缩
         }
     }
 
@@ -208,8 +208,8 @@ public class BinarySerializer {
      */
     public void maybeDisableCompressed() throws IOException {
         if (enableCompress) {
-            switcher.get().flushToTarget(true);
-            switcher.select(false);
+            switcher.get().flushToTarget(true); // 刷新数据
+            switcher.select(false); // 禁用压缩
         }
     }
 
@@ -220,8 +220,8 @@ public class BinarySerializer {
      * @throws IOException 如果写入失败
      */
     public void writeFloat(float datum) throws IOException {
-        int x = Float.floatToIntBits(datum);
-        writeInt(x);
+        int x = Float.floatToIntBits(datum); // 将浮点数转换为整数
+        writeInt(x); // 写入整数
     }
 
     /**
@@ -232,7 +232,7 @@ public class BinarySerializer {
      */
     @SuppressWarnings("PointlessBitwiseExpression")
     public void writeDouble(double datum) throws IOException {
-        long x = Double.doubleToLongBits(datum);
+        long x = Double.doubleToLongBits(datum); // 将双精度浮点数转换为长整数
         // @formatter:off
         writeBuffer[0] = (byte) ((x >>> 0)  & 0xFF);
         writeBuffer[1] = (byte) ((x >>> 8)  & 0xFF);
@@ -242,7 +242,7 @@ public class BinarySerializer {
         writeBuffer[5] = (byte) ((x >>> 40) & 0xFF);
         writeBuffer[6] = (byte) ((x >>> 48) & 0xFF);
         writeBuffer[7] = (byte) ((x >>> 56) & 0xFF);
-        switcher.get().writeBinary(writeBuffer, 0, 8);
+        switcher.get().writeBinary(writeBuffer, 0, 8); // 写入双精度浮点数
         // @formatter:on
     }
 
@@ -253,7 +253,7 @@ public class BinarySerializer {
      * @throws IOException 如果写入失败
      */
     public void writeBytes(byte[] bytes) throws IOException {
-        writeBytes(bytes, 0, bytes.length);
+        writeBytes(bytes, 0, bytes.length); // 写入整个字节数组
     }
     
     /**
@@ -265,6 +265,6 @@ public class BinarySerializer {
      * @throws IOException 如果写入失败
      */
     public void writeBytes(byte[] bytes, int offset, int length) throws IOException {
-        switcher.get().writeBinary(bytes, offset, length);
+        switcher.get().writeBinary(bytes, offset, length); // 写入字节数组的指定部分
     }
 }

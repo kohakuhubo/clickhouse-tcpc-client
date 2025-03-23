@@ -1,5 +1,9 @@
 package com.berry.clickhouse.tcp.client.misc;
 
+/**
+ * ClickHouseCityHash类实现了CityHash算法
+ * 用于高效的哈希计算
+ */
 public class ClickHouseCityHash {
 
     private static final long k0 = 0xc3a5c85c97cb3127L;
@@ -8,6 +12,13 @@ public class ClickHouseCityHash {
     private static final long k3 = 0xc949d7c7509e6557L;
     private static final long kMul = 0x9ddfea08eb382d69L;
 
+    /**
+     * 将字节数组转换为长整型（小端）
+     * 
+     * @param bytes 字节数组
+     * @param offset 偏移量
+     * @return 转换后的长整型
+     */
     private static long toLongLE(byte[] bytes, int offset) {
         return (((long) (bytes[offset + 7] & 255) << 56) +
                 ((long) (bytes[offset + 6] & 255) << 48) +

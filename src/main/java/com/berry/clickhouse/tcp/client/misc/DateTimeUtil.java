@@ -3,18 +3,26 @@ package com.berry.clickhouse.tcp.client.misc;
 import com.berry.clickhouse.tcp.client.NativeContext;
 import com.berry.clickhouse.tcp.client.settings.SettingKey;
 
-
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+/**
+ * DateTimeUtil类提供了一些日期时间相关的工具方法
+ */
 public class DateTimeUtil {
 
+    /**
+     * 选择时区
+     * 
+     * @param serverContext 服务器上下文
+     * @return 选择的时区
+     */
     public static ZoneId chooseTimeZone(NativeContext.ServerContext serverContext) {
         return (boolean) serverContext.getConfigure().settings().getOrDefault(SettingKey.use_client_time_zone, false)
-                ? ZoneId.systemDefault() : serverContext.timeZone();
+                ? ZoneId.systemDefault() : serverContext.timeZone(); // 返回选择的时区
     }
 
     public static LocalDateTime convertTimeZone(LocalDateTime localDateTime, ZoneId from, ZoneId to) {

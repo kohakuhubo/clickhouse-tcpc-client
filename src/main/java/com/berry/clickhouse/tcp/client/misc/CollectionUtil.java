@@ -1,14 +1,23 @@
 package com.berry.clickhouse.tcp.client.misc;
 
-
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * CollectionUtil类提供了一些集合操作的工具方法
+ */
 public class CollectionUtil {
 
+    /**
+     * 连接两个列表
+     * 
+     * @param first 第一个列表
+     * @param second 第二个列表
+     * @return 连接后的列表
+     */
     public static <T> List<T> concat(List<T> first, List<T> second) {
-        return Stream.concat(first.stream(), second.stream()).collect(Collectors.toList());
+        return Stream.concat(first.stream(), second.stream()).collect(Collectors.toList()); // 返回连接后的列表
     }
 
     @SafeVarargs

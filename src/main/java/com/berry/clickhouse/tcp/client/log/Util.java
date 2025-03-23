@@ -1,10 +1,21 @@
 package com.berry.clickhouse.tcp.client.log;
 
+/**
+ * Util类提供了一些实用的静态方法
+ * 包括安全获取系统属性和报告错误的方法
+ */
 public final class Util {
 
     private Util() {
     }
 
+    /**
+     * 安全获取系统属性
+     * 
+     * @param key 属性名称
+     * @return 属性值，如果未找到则返回null
+     * @throws IllegalArgumentException 如果输入为null
+     */
     public static String safeGetSystemProperty(String key) {
         if (key == null)
             throw new IllegalArgumentException("null input");
@@ -18,6 +29,12 @@ public final class Util {
         return result;
     }
 
+    /**
+     * 安全获取布尔类型的系统属性
+     * 
+     * @param key 属性名称
+     * @return true如果属性值为"true"，false否则
+     */
     public static boolean safeGetBooleanSystemProperty(String key) {
         String value = safeGetSystemProperty(key);
         if (value == null)
@@ -55,6 +72,11 @@ public final class Util {
         }
     }
 
+    /**
+     * 获取调用类的Class对象
+     * 
+     * @return 调用类的Class对象
+     */
     public static Class<?> getCallingClass() {
         ClassContextSecurityManager securityManager = getSecurityManager();
         if (securityManager == null)
@@ -75,12 +97,23 @@ public final class Util {
         return trace[i + 2];
     }
 
+    /**
+     * 报告错误信息
+     * 
+     * @param msg 错误消息
+     * @param t 异常信息
+     */
     static public void report(String msg, Throwable t) {
         System.err.println(msg);
         System.err.println("Reported exception:");
         t.printStackTrace();
     }
 
+    /**
+     * 报告信息
+     * 
+     * @param msg 信息消息
+     */
     static public void report(String msg) {
         System.err.println("LOG: " + msg);
     }

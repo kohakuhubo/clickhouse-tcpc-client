@@ -1,13 +1,21 @@
 package com.berry.clickhouse.tcp.client.misc;
 
-
-
+/**
+ * StrUtil类提供了一些字符串操作的工具方法
+ */
 public class StrUtil {
 
-    public static String getOrDefault( String origin, String defaultValue) {
+    /**
+     * 获取字符串或默认值
+     * 
+     * @param origin 原始字符串
+     * @param defaultValue 默认值
+     * @return 返回原始字符串或默认值
+     */
+    public static String getOrDefault(String origin, String defaultValue) {
         if (origin == null || origin.isEmpty())
-            return defaultValue;
-        return origin;
+            return defaultValue; // 返回默认值
+        return origin; // 返回原始字符串
     }
 
     public static String toString( Object object) {
