@@ -39,16 +39,6 @@ public class DataTypeInt16 implements BaseDataTypeInt16<Short> {
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[]{"SMALLINT"}; // 返回别名数组
-    }
-
-    @Override
-    public Short deserializeText(SQLLexer lexer) throws SQLException {
-        return lexer.numberLiteral().shortValue(); // 从文本解析Short值
-    }
-
-    @Override
     public boolean isSigned() {
         return true; // Int16是有符号的
     }

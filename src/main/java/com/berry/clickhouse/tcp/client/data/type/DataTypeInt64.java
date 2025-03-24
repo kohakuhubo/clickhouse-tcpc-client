@@ -39,16 +39,6 @@ public class DataTypeInt64 implements BaseDataTypeInt64<Long> {
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[]{"BIGINT"}; // 返回别名数组
-    }
-
-    @Override
-    public Long deserializeText(SQLLexer lexer) throws SQLException {
-        return lexer.numberLiteral().longValue(); // 从文本解析Long值
-    }
-
-    @Override
     public boolean isSigned() {
         return true; // Int64是有符号的
     }

@@ -49,11 +49,6 @@ public class DataTypeLowCardinality implements IDataType {
     }
 
     @Override
-    public Object deserializeText(SQLLexer lexer) throws SQLException {
-        return this.nestedDataType.deserializeText(lexer);
-    }
-
-    @Override
     public void serializeBinary(Object data, BinarySerializer serializer) throws SQLException, IOException {
         this.nestedDataType.serializeBinary(data, serializer);
     }

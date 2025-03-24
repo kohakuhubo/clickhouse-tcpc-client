@@ -14,28 +14,28 @@ public interface IColumn {
 
     /**
      * 检查列是否被导出
-     * 
+     *
      * @return 如果列被导出则返回true，否则返回false
      */
     boolean isExported();
 
     /**
      * 获取列名
-     * 
+     *
      * @return 列名
      */
     String name();
 
     /**
      * 获取列的数据类型
-     * 
+     *
      * @return 数据类型
      */
     IDataType<?> type();
 
     /**
      * 获取指定索引的值
-     * 
+     *
      * @param idx 索引
      * @return 值
      */
@@ -43,36 +43,81 @@ public interface IColumn {
 
     /**
      * 设置列的值
-     * 
+     *
      * @param values 值数组
      */
     void setValues(Object[] values);
 
     /**
      * 将对象写入列
-     * 
+     *
      * @param object 要写入的对象
-     * @throws IOException 如果写入过程中发生I/O错误
+     * @throws IOException  如果写入过程中发生I/O错误
      * @throws SQLException 如果写入过程中发生SQL错误
      */
     void write(Object object) throws IOException, SQLException;
 
     /**
+     * 将字节数组写入列
+     *
+     * @param bytes  字节数组
+     * @param offset 偏移量
+     * @param length 长度
+     * @throws IOException  如果写入过程中发生I/O错
+     * @throws SQLException 如果写入过程中发生SQL错误
+     */
+    void write(byte[] bytes, int offset, int length) throws IOException, SQLException;
+
+    /**
+     * 将字节数组写入列
+     *
+     * @param bytes  字节数组
+     * @param offset 偏移量
+     * @param length 长度
+     * @throws IOException  如果写入过程中发生I/O错
+     * @throws SQLException 如果写入过程中发生SQL错误
+     */
+    default void writeInt(byte[] bytes, int offset, int length) throws IOException, SQLException {
+        writeInt(bytes, offset, length, true);
+    }
+
+    /**
+     * 将字节写入列
+     *
+     * @param byt 字节
+     * @throws IOException  如果写入过程中发生I/O错
+     * @throws SQLException 如果写入过程中发生SQL错误
+     */
+    void write(byte byt) throws IOException, SQLException;
+
+    /**
+     * 将字节数组写入列
+     *
+     * @param bytes          字节数组
+     * @param offset         偏移量
+     * @param length         长度
+     * @param isLittleEndian 是否使用小端字节序
+     * @throws IOException  如果写入过程中发生I/O错
+     * @throws SQLException 如果写入过程中发生SQL错误
+     */
+    void writeInt(byte[] bytes, int offset, int length, boolean isLittleEndian) throws IOException, SQLException;
+
+    /**
      * 从二进制反序列化器读取数据
-     * 
-     * @param rows 行数
+     *
+     * @param rows               行数
      * @param binaryDeserializer 二进制反序列化器
-     * @throws IOException 如果读取过程中发生I/O错误
+     * @throws IOException  如果读取过程中发生I/O错误
      * @throws SQLException 如果读取过程中发生SQL错误
      */
     void read(int rows, BinaryDeserializer binaryDeserializer) throws IOException, SQLException;
 
     /**
      * 将列数据写入二进制序列化器
-     * 
+     *
      * @param serializer 二进制序列化器
-     * @param now 是否立即写入
-     * @throws IOException 如果写入过程中发生I/O错误
+     * @param now        是否立即写入
+     * @throws IOException  如果写入过程中发生I/O错误
      * @throws SQLException 如果写入过程中发生SQL错误
      */
     void flushToSerializer(BinarySerializer serializer, boolean now) throws IOException, SQLException;
@@ -84,35 +129,35 @@ public interface IColumn {
 
     /**
      * 设置列的写入缓冲区
-     * 
+     *
      * @param buffer 写入缓冲区
      */
     void setColumnWriterBuffer(ColumnWriterBuffer buffer);
 
     /**
      * 获取列的写入缓冲区
-     * 
+     *
      * @return 写入缓冲区
      */
     ColumnWriterBuffer getColumnWriterBuffer();
 
     /**
      * 获取行数
-     * 
+     *
      * @return 行数
      */
     int rowCnt();
 
     /**
      * 增加行数
-     * 
+     *
      * @return 当前行数
      */
     int addRowCnt();
 
     /**
      * 增加指定数量的行数
-     * 
+     *
      * @param count 增加的行数
      * @return 当前行数
      */
@@ -125,7 +170,7 @@ public interface IColumn {
 
     /**
      * 获取列的所有值
-     * 
+     *
      * @return 值数组
      */
     Object[] values();

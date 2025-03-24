@@ -48,22 +48,4 @@ public class DataTypeDate implements IDataType<LocalDate> {
         short epochDay = deserializer.readShort(); // 从二进制流反序列化
         return LocalDate.ofEpochDay(epochDay & 0xFFFF); // 返回LocalDate
     }
-
-    @Override
-    public String[] getAliases() {
-        return new String[0]; // 返回别名数组
-    }
-
-    @Override
-    public LocalDate deserializeText(SQLLexer lexer) throws SQLException {
-        Validate.isTrue(lexer.character() == '\''); // 验证字符为单引号
-        int year = lexer.numberLiteral().intValue(); // 解析年份
-        Validate.isTrue(lexer.character() == '-'); // 验证字符为'-'
-        int month = lexer.numberLiteral().intValue(); // 解析月份
-        Validate.isTrue(lexer.character() == '-'); // 验证字符为'-'
-        int day = lexer.numberLiteral().intValue(); // 解析日期
-        Validate.isTrue(lexer.character() == '\''); // 验证字符为单引号
-
-        return LocalDate.of(year, month, day); // 返回LocalDate
-    }
 }

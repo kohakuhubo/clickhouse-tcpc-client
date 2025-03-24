@@ -82,6 +82,10 @@ public class DataTypeFactory {
             return DataTypeNothing.CREATOR.createDataType(lexer, serverContext);
         } else if (dataTypeName.equalsIgnoreCase("Map")) {
             return DataTypeMap.creator.createDataType(lexer, serverContext);
+        } else if (dataTypeName.equalsIgnoreCase("SimpleAggregateFunction")) {
+            return DataTypeSimpleAggregateFunction.creator.createDataType(lexer, serverContext);
+        } else if (dataTypeName.equalsIgnoreCase("AggregateFunction")) {
+            return DataTypeAggregateFunction.creator.createDataType(lexer, serverContext);
         } else {
             IDataType<?> dataType = dataTypes.get(dataTypeName.toLowerCase(Locale.ROOT));
             Validate.isTrue(dataType != null, "Unknown data type: " + dataTypeName);
@@ -115,21 +119,5 @@ public class DataTypeFactory {
 
     private static void registerType(Map<String, IDataType<?>> creators, IDataType<?> type) {
         creators.put(type.name().toLowerCase(Locale.ROOT), type);
-        for (String typeName : type.getAliases()) {
-            creators.put(typeName.toLowerCase(Locale.ROOT), type);
-        }
-    }
-
-    private static Map<String, DataTypeCreator<?>> initComplexDataTypes() {
-        return new HashMap<>();
-    }
-
-    private static void registerComplexType(
-            Map<String, DataTypeCreator<?>> creators, IDataType<?> type, DataTypeCreator<?> creator) {
-
-        creators.put(type.name().toLowerCase(Locale.ROOT), creator);
-        for (String typeName : type.getAliases()) {
-            creators.put(typeName.toLowerCase(Locale.ROOT), creator);
-        }
     }
 }

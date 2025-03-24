@@ -40,11 +40,6 @@ public class DataTypeUInt16 implements BaseDataTypeInt16<Integer> {
     }
 
     @Override
-    public Integer deserializeText(SQLLexer lexer) throws SQLException {
-        return lexer.numberLiteral().intValue(); // 从文本解析Integer值
-    }
-
-    @Override
     public boolean isSigned() {
         return false; // UInt16是无符号的
     }

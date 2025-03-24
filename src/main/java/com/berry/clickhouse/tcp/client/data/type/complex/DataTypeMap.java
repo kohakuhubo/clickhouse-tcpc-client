@@ -138,37 +138,6 @@ public class DataTypeMap implements IDataType<Object> {
     }
 
     /**
-     * 从SQL词法分析器解析Map
-     * 解析格式为 {key1:value1, key2:value2, ...}
-     * 
-     * @param lexer SQL词法分析器
-     * @return 解析后的Map
-     * @throws SQLException 如果解析过程中发生错误
-     */
-    @Override
-    public Object deserializeText(SQLLexer lexer) throws SQLException {
-        Map<Object, Object> result = new HashMap<>();
-        Object key = null;
-        Object value = null;
-        Validate.isTrue(lexer.character() == '{');
-        for (; ; ) {
-            if (lexer.isCharacter('}')) {
-                lexer.character();
-                break;
-            }
-            key = getNestedTypes()[0].deserializeText(lexer);
-            Validate.isTrue(lexer.character() == ':');
-            value = getNestedTypes()[1].deserializeText(lexer);
-            if (lexer.isCharacter(',')) {
-                lexer.character();
-            }
-            result.put(key, value);
-        }
-
-        return result;
-    }
-
-    /**
      * 从二进制流反序列化Map
      * 先读取Map大小，然后读取所有键和所有值，最后组装成Map
      * 

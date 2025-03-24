@@ -91,6 +91,12 @@ public class DataTypeString implements IDataType<CharSequence> {
         }
     }
 
+    @Override
+    public void serializeBinary(byte[] bytes, int offset, int length, BinarySerializer serializer) throws SQLException, IOException {
+        serializer.writeInt(length);
+        serializer.writeBytes(bytes, offset, length);
+    }
+
     /**
      * 从二进制流反序列化字符串
      * 读取字节数组并使用指定字符集解码为字符串
@@ -104,48 +110,5 @@ public class DataTypeString implements IDataType<CharSequence> {
     public String deserializeBinary(BinaryDeserializer deserializer) throws SQLException, IOException {
         byte[] bs = deserializer.readBytesBinary();
         return new String(bs, charset);
-    }
-
-    /**
-     * 从SQL词法分析器解析字符串
-     * 
-     * @param lexer SQL词法分析器
-     * @return 解析后的字符串视图
-     * @throws SQLException 如果解析过程中发生错误
-     */
-    @Override
-    public CharSequence deserializeText(SQLLexer lexer) throws SQLException {
-        return lexer.stringView();
-    }
-
-    /**
-     * 获取字符串类型的别名数组
-     * 包括各种SQL中常见的字符串类型名称
-     * 
-     * @return 字符串类型的别名数组
-     */
-    @Override
-    public String[] getAliases() {
-        return new String[]{
-                "LONGBLOB",
-                "MEDIUMBLOB",
-                "TINYBLOB",
-                "MEDIUMTEXT",
-                "CHAR",
-                "VARCHAR",
-                "TEXT",
-                "TINYTEXT",
-                "LONGTEXT",
-                "BLOB"};
-    }
-
-    /**
-     * 判断是否是固定长度类型
-     * 
-     * @return false，因为字符串长度是可变的
-     */
-    @Override
-    public boolean isFixedLength() {
-        return false;
     }
 }

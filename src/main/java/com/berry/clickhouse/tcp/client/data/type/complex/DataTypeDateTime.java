@@ -54,25 +54,6 @@ public class DataTypeDateTime implements IDataType<ZonedDateTime> {
     }
 
     @Override
-    public ZonedDateTime deserializeText(SQLLexer lexer) throws SQLException {
-        Validate.isTrue(lexer.character() == '\'');
-        int year = lexer.numberLiteral().intValue();
-        Validate.isTrue(lexer.character() == '-');
-        int month = lexer.numberLiteral().intValue();
-        Validate.isTrue(lexer.character() == '-');
-        int day = lexer.numberLiteral().intValue();
-        Validate.isTrue(lexer.isWhitespace());
-        int hours = lexer.numberLiteral().intValue();
-        Validate.isTrue(lexer.character() == ':');
-        int minutes = lexer.numberLiteral().intValue();
-        Validate.isTrue(lexer.character() == ':');
-        int seconds = lexer.numberLiteral().intValue();
-        Validate.isTrue(lexer.character() == '\'');
-
-        return ZonedDateTime.of(year, month, day, hours, minutes, seconds, 0, tz);
-    }
-
-    @Override
     public void serializeBinary(ZonedDateTime data, BinarySerializer serializer) throws SQLException, IOException {
         serializer.writeInt((int) DateTimeUtil.toEpochSecond(data));
     }
@@ -81,10 +62,5 @@ public class DataTypeDateTime implements IDataType<ZonedDateTime> {
     public ZonedDateTime deserializeBinary(BinaryDeserializer deserializer) throws SQLException, IOException {
         int epochSeconds = deserializer.readInt();
         return DateTimeUtil.toZonedDateTime(epochSeconds, 0, tz);
-    }
-
-    @Override
-    public String[] getAliases() {
-        return new String[]{"TIMESTAMP"};
     }
 }

@@ -70,11 +70,6 @@ public class DataTypeEnum8 implements IDataType<String> {
     }
 
     @Override
-    public String deserializeText(SQLLexer lexer) throws SQLException {
-        return lexer.stringLiteral();
-    }
-
-    @Override
     public void serializeBinary(String data, BinarySerializer serializer) throws SQLException, IOException {
         for (int i = 0; i < names.length; i++) {
             if (data.equals(names[i])) {

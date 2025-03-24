@@ -75,28 +75,6 @@ public class DataTypeInt32 implements BaseDataTypeInt32<Integer> {
     }
 
     /**
-     * 获取数据类型的别名
-     * 
-     * @return 别名数组，包括"INT"和"INTEGER"
-     */
-    @Override
-    public String[] getAliases() {
-        return new String[]{"INT", "INTEGER"};
-    }
-
-    /**
-     * 从SQL词法分析器解析整数
-     * 
-     * @param lexer SQL词法分析器
-     * @return 解析后的整数
-     * @throws SQLException 如果解析过程中发生SQL错误
-     */
-    @Override
-    public Integer deserializeText(SQLLexer lexer) throws SQLException {
-        return lexer.numberLiteral().intValue();
-    }
-
-    /**
      * 判断数据类型是否有符号
      * 
      * @return 返回true，表示Int32是有符号的

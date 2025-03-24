@@ -58,18 +58,6 @@ public class DataTypeNullable implements IDataType {
     }
 
     @Override
-    public Object deserializeText(SQLLexer lexer) throws SQLException {
-        if (lexer.isCharacter('n') || lexer.isCharacter('N')) {
-            Validate.isTrue(Character.toLowerCase(lexer.character()) == 'n');
-            Validate.isTrue(Character.toLowerCase(lexer.character()) == 'u');
-            Validate.isTrue(Character.toLowerCase(lexer.character()) == 'l');
-            Validate.isTrue(Character.toLowerCase(lexer.character()) == 'l');
-            return null;
-        }
-        return nestedDataType.deserializeText(lexer);
-    }
-
-    @Override
     public void serializeBinary(Object data, BinarySerializer serializer) throws SQLException, IOException {
         this.nestedDataType.serializeBinary(data, serializer);
     }

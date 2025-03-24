@@ -69,20 +69,6 @@ public class DataTypeDecimal implements IDataType<BigDecimal>, BytesHelper {
     }
 
     @Override
-    public BigDecimal deserializeText(SQLLexer lexer) throws SQLException {
-        BigDecimal result;
-        if (lexer.isCharacter('\'')) {
-            String v = lexer.stringLiteral();
-            result = new BigDecimal(v);
-        } else {
-            Number v = lexer.numberLiteral();
-            result = BigDecimal.valueOf(v.doubleValue());
-        }
-        result = result.setScale(scale, RoundingMode.HALF_UP);
-        return result;
-    }
-
-    @Override
     public void serializeBinary(BigDecimal data, BinarySerializer serializer) throws IOException {
         BigDecimal targetValue = data.multiply(scaleFactor);
         switch (this.nobits) {

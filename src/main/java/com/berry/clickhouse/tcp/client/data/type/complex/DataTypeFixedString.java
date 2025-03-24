@@ -145,27 +145,4 @@ public class DataTypeFixedString implements IDataType<CharSequence> {
     public String deserializeBinary(BinaryDeserializer deserializer) throws SQLException, IOException {
         return new String(deserializer.readBytes(n), charset);
     }
-
-    /**
-     * 从文本格式反序列化数据
-     *
-     * @param lexer SQL 词法分析器
-     * @return 解析后的字符序列
-     * @throws SQLException 解析过程中发生错误时抛出
-     */
-    @Override
-    public CharSequence deserializeText(SQLLexer lexer) throws SQLException {
-        return lexer.stringLiteral();
-    }
-
-    /**
-     * 获取该数据类型的别名列表
-     * 当前支持 'BINARY' 作为别名
-     *
-     * @return 别名数组
-     */
-    @Override
-    public String[] getAliases() {
-        return new String[]{"BINARY"};
-    }
 }

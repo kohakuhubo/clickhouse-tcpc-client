@@ -40,16 +40,6 @@ public class DataTypeFloat64 implements IDataType<Double> {
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[]{"DOUBLE"}; // 返回别名数组
-    }
-
-    @Override
-    public Double deserializeText(SQLLexer lexer) throws SQLException {
-        return lexer.numberLiteral().doubleValue(); // 从文本解析Double值
-    }
-
-    @Override
     public boolean isSigned() {
         return true; // Float64是有符号的
     }

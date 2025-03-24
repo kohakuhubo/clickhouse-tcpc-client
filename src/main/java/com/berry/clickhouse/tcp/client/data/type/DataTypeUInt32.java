@@ -40,11 +40,6 @@ public class DataTypeUInt32 implements BaseDataTypeInt32<Long> {
     }
 
     @Override
-    public Long deserializeText(SQLLexer lexer) throws SQLException {
-        return lexer.numberLiteral().longValue(); // 从文本解析Long值
-    }
-
-    @Override
     public boolean isSigned() {
         return false; // UInt32是无符号的
     }

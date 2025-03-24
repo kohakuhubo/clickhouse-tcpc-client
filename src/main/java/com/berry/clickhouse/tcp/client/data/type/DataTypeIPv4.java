@@ -38,14 +38,4 @@ public class DataTypeIPv4 implements IDataType<Long> {
     public Long deserializeBinary(BinaryDeserializer deserializer) throws SQLException, IOException {
         return deserializer.readInt() & 0xffffffffL; // 从二进制流反序列化
     }
-
-    @Override
-    public String[] getAliases() {
-        return new String[0]; // 返回别名数组
-    }
-
-    @Override
-    public Long deserializeText(SQLLexer lexer) throws SQLException {
-        return lexer.numberLiteral().longValue() & 0xffffffffL; // 从文本解析IPv4值
-    }
 }

@@ -44,14 +44,4 @@ public class DataTypeNothing implements IDataType<Object> {
         deserializer.readByte();
         return null;
     }
-
-    @Override
-    public String[] getAliases() {
-        return new String[]{"NULL"};
-    }
-
-    @Override
-    public Object deserializeText(SQLLexer lexer) throws SQLException {
-        throw new InvalidOperationException("Nothing datatype can't deserializeText");
-    }
 }

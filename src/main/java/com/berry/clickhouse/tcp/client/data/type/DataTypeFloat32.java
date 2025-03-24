@@ -40,16 +40,6 @@ public class DataTypeFloat32 implements IDataType<Float> {
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[]{"FLOAT"}; // 返回别名数组
-    }
-
-    @Override
-    public Float deserializeText(SQLLexer lexer) throws SQLException {
-        return lexer.numberLiteral().floatValue(); // 从文本解析Float值
-    }
-
-    @Override
     public boolean isSigned() {
         return true; // Float32是有符号的
     }

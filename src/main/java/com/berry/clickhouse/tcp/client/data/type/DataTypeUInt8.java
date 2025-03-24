@@ -40,11 +40,6 @@ public class DataTypeUInt8 implements BaseDataTypeInt8<Short> {
     }
 
     @Override
-    public Short deserializeText(SQLLexer lexer) throws SQLException {
-        return lexer.numberLiteral().shortValue(); // 从文本解析Short值
-    }
-
-    @Override
     public boolean isSigned() {
         return false; // UInt8是无符号的
     }

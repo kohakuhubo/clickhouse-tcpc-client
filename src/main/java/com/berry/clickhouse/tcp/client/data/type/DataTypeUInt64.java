@@ -42,16 +42,6 @@ public class DataTypeUInt64 implements BaseDataTypeInt64<BigInteger>, BytesHelpe
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[0]; // 返回别名数组
-    }
-
-    @Override
-    public BigInteger deserializeText(SQLLexer lexer) throws SQLException {
-        return BigInteger.valueOf(lexer.numberLiteral().longValue()); // 从文本解析BigInteger值
-    }
-
-    @Override
     public boolean isSigned() {
         return false; // UInt64是无符号的
     }

@@ -32,11 +32,6 @@ public class DataTypeUUID implements IDataType<UUID> {
     }
 
     @Override
-    public UUID deserializeText(SQLLexer lexer) throws SQLException {
-        return UUID.fromString(lexer.stringLiteral()); // 从文本解析UUID值
-    }
-
-    @Override
     public void serializeBinary(UUID data, BinarySerializer serializer) throws SQLException, IOException {
         serializer.writeLong(data.getMostSignificantBits()); // 序列化为二进制格式
         serializer.writeLong(data.getLeastSignificantBits()); // 序列化为二进制格式

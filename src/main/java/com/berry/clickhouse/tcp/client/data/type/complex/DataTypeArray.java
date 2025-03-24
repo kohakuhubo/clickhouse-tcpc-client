@@ -25,13 +25,13 @@ import java.util.List;
  * 数组数据类型实现
  * 处理ClickHouse中的Array类型，可以包含任意类型的元素
  */
-public class DataTypeArray implements IDataType<ClickHouseArray> {
+public class DataTypeArray implements IDataType<Object> {
 
     /**
      * 数组类型创建器
      * 用于根据词法分析结果创建DataTypeArray实例
      */
-    public static DataTypeCreator<ClickHouseArray> creator = (lexer, serverContext) -> {
+    public static DataTypeCreator<Object> creator = (lexer, serverContext) -> {
         Validate.isTrue(lexer.character() == '(');
         IDataType<?> arrayNestedType = DataTypeFactory.get(lexer, serverContext);
         Validate.isTrue(lexer.character() == ')');
@@ -100,45 +100,29 @@ public class DataTypeArray implements IDataType<ClickHouseArray> {
      * @return ClickHouseArray.class
      */
     @Override
-    public Class<ClickHouseArray> javaType() {
-        return ClickHouseArray.class;
+    public Class<Object> javaType() {
+        return Object.class;
     }
 
     /**
-     * 从SQL词法分析器解析数组
-     * 
-     * @param lexer SQL词法分析器
-     * @return 解析后的数组
-     * @throws SQLException 如果解析过程中发生错误
-     */
-    @Override
-    public ClickHouseArray deserializeText(SQLLexer lexer) throws SQLException {
-        Validate.isTrue(lexer.character() == '[');
-        List<Object> arrayData = new ArrayList<>();
-        for (; ; ) {
-            if (lexer.isCharacter(']')) {
-                lexer.character();
-                break;
-            }
-            if (lexer.isCharacter(',')) {
-                lexer.character();
-            }
-            arrayData.add(elemDataType.deserializeText(lexer));
-        }
-        return new ClickHouseArray(elemDataType, arrayData.toArray());
-    }
-
-    /**
-     * 将数组序列化为二进制格式
-     * 
-     * @param data 要序列化的数组
+     * 批量将数组序列化为二进制格式
+     *
+     * @param data 要序列化的数组数组
      * @param serializer 二进制序列化器
      * @throws SQLException 如果序列化过程中发生SQL错误
      * @throws IOException 如果序列化过程中发生I/O错误
      */
     @Override
-    public void serializeBinary(ClickHouseArray data, BinarySerializer serializer) throws SQLException, IOException {
-        for (Object f : data.getArray()) {
+    public void serializeBinary(Object data, BinarySerializer serializer) throws SQLException, IOException {
+        Object[] value;
+        if (data.getClass().isArray()) {
+            value = (Object[]) data;
+        } else if (data instanceof List) {
+            value = ((List<?>) data).toArray();
+        } else {
+            value = ((ClickHouseArray) data).getArray();
+        }
+        for (Object f : value) {
             getElemDataType().serializeBinary(f, serializer);
         }
     }
@@ -152,7 +136,7 @@ public class DataTypeArray implements IDataType<ClickHouseArray> {
      * @throws IOException 如果序列化过程中发生I/O错误
      */
     @Override
-    public void serializeBinaryBulk(ClickHouseArray[] data, BinarySerializer serializer) throws SQLException, IOException {
+    public void serializeBinaryBulk(Object[] data, BinarySerializer serializer) throws SQLException, IOException {
         offsetIDataType.serializeBinary((long) data.length, serializer);
         getElemDataType().serializeBinaryBulk(data, serializer);
     }

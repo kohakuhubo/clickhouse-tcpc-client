@@ -48,17 +48,6 @@ public class DataTypeIPv6 implements IDataType<BigInteger> {
         return new BigInteger(1, bytes); // 返回BigInteger
     }
 
-    @Override
-    public String[] getAliases() {
-        return new String[0]; // 返回别名数组
-    }
-
-    @Override
-    public BigInteger deserializeText(SQLLexer lexer) throws SQLException {
-        String ipv6String = convertIPv6ToHexadecimalString(lexer.stringLiteral()); // 从文本解析IPv6值
-        return new BigInteger(ipv6String, 16); // 返回BigInteger
-    }
-
     private static String convertIPv6ToHexadecimalString(String ipv6) {
         return ipv6.replace(":", ""); // 转换IPv6地址为十六进制字符串
     }

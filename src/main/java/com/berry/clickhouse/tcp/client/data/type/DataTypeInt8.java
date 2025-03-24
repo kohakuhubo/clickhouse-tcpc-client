@@ -39,16 +39,6 @@ public class DataTypeInt8 implements BaseDataTypeInt8<Byte> {
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[]{"TINYINT"}; // 返回别名数组
-    }
-
-    @Override
-    public Byte deserializeText(SQLLexer lexer) throws SQLException {
-        return lexer.numberLiteral().byteValue(); // 从文本解析Byte值
-    }
-
-    @Override
     public boolean isSigned() {
         return true; // Int8是有符号的
     }

@@ -114,19 +114,6 @@ public class DataTypeTuple implements IDataType<ClickHouseStruct> {
         return rowsWithElems;
     }
 
-    @Override
-    public ClickHouseStruct deserializeText(SQLLexer lexer) throws SQLException {
-        Validate.isTrue(lexer.character() == '(');
-        Object[] tupleData = new Object[getNestedTypes().length];
-        for (int i = 0; i < getNestedTypes().length; i++) {
-            if (i > 0)
-                Validate.isTrue(lexer.character() == ',');
-            tupleData[i] = getNestedTypes()[i].deserializeText(lexer);
-        }
-        Validate.isTrue(lexer.character() == ')');
-        return new ClickHouseStruct("Tuple", tupleData);
-    }
-
     public IDataType[] getNestedTypes() {
         return nestedTypes;
     }

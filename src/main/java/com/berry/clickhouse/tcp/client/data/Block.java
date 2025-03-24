@@ -355,6 +355,10 @@ public class Block {
         return columns[columnIdx];
     }
 
+    public IColumn getColumn(String columnName) throws SQLException {
+        return columns[getPositionByName(columnName)];
+    }
+
     public int getPositionByName(String columnName) throws SQLException {
         Validate.isTrue(nameAndPositions.containsKey(columnName), "Column '" + columnName + "' does not exist");
         return nameAndPositions.get(columnName);

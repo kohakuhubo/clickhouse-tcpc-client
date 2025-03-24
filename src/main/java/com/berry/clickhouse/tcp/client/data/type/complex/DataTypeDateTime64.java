@@ -158,40 +158,6 @@ public class DataTypeDateTime64 implements IDataType<ZonedDateTime> {
     }
 
     /**
-     * 从SQL词法分析器解析DateTime64
-     * 解析格式为: toDateTime64('YYYY-MM-DD HH:MM:SS.sss')
-     * 
-     * @param lexer SQL词法分析器
-     * @return 解析后的ZonedDateTime
-     * @throws SQLException 如果解析过程中发生错误
-     */
-    @Override
-    public ZonedDateTime deserializeText(SQLLexer lexer) throws SQLException {
-        StringView dataTypeName = lexer.bareWord();
-        Validate.isTrue(dataTypeName.checkEquals("toDateTime64"));
-        Validate.isTrue(lexer.character() == '(');
-        Validate.isTrue(lexer.character() == '\'');
-        int year = lexer.numberLiteral().intValue();
-        Validate.isTrue(lexer.character() == '-');
-        int month = lexer.numberLiteral().intValue();
-        Validate.isTrue(lexer.character() == '-');
-        int day = lexer.numberLiteral().intValue();
-        Validate.isTrue(lexer.isWhitespace());
-        int hours = lexer.numberLiteral().intValue();
-        Validate.isTrue(lexer.character() == ':');
-        int minutes = lexer.numberLiteral().intValue();
-        Validate.isTrue(lexer.character() == ':');
-        BigDecimal _seconds = BigDecimal.valueOf(lexer.numberLiteral().doubleValue())
-                .setScale(scale, BigDecimal.ROUND_HALF_UP);
-        int second = _seconds.intValue();
-        int nanos = _seconds.subtract(BigDecimal.valueOf(second)).movePointRight(9).intValue();
-        Validate.isTrue(lexer.character() == '\'');
-        Validate.isTrue(lexer.character() == ')');
-
-        return ZonedDateTime.of(year, month, day, hours, minutes, second, nanos, tz);
-    }
-
-    /**
      * 将ZonedDateTime序列化为二进制格式
      * 将日期时间转换为从EPOCH开始的纳秒数，然后根据精度缩放
      * 

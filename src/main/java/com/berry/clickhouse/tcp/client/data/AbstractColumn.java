@@ -38,7 +38,7 @@ public abstract class AbstractColumn implements IColumn {
     }
 
     @Override
-    public IDataType type() {
+    public IDataType<?> type() {
         return type;
     }
 
@@ -74,6 +74,21 @@ public abstract class AbstractColumn implements IColumn {
     @Override
     public void read(int rows, BinaryDeserializer binaryDeserializer) throws IOException, SQLException {
         this.type.deserializeBinaryBulk(rows, binaryDeserializer);
+    }
+
+    @Override
+    public void write(byte[] bytes, int offset, int length) throws IOException, SQLException {
+        type().serializeBinary(bytes, offset, length, buffer.column);
+    }
+
+    @Override
+    public void writeInt(byte[] bytes, int offset, int length, boolean isLittleEndian) throws IOException, SQLException {
+        type().serializeIntBinary(bytes, offset, length, isLittleEndian, buffer.column);
+    }
+
+    @Override
+    public void write(byte byt) throws IOException, SQLException {
+        type().serializeByteBinary(byt, buffer.column);
     }
 
     @Override
