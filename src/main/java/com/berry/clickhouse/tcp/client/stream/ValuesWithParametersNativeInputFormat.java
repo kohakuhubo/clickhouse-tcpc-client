@@ -39,7 +39,7 @@ public class ValuesWithParametersNativeInputFormat implements NativeInputFormat 
                 lexer.character(); // 跳过占位符
             } else {
                 constIdxFlags.set(columnIdx); // 设置列索引标志
-                block.setObject(columnIdx, block.getColumn(columnIdx).type().deserializeText(lexer)); // 反序列化并设置对象
+                block.setObject(columnIdx, block.getColumn(columnIdx).type()); // 反序列化并设置对象
             }
         }
 

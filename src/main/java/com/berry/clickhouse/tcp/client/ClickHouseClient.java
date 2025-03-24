@@ -125,7 +125,7 @@ public class ClickHouseClient {
         public ClickHouseClient build() throws Exception {
             // 创建连接并验证连接有效性
             ClickHouseConnection clickHouseConnection = ClickHouseConnection.createClickHouseConnection(clickHouseConfig);
-            if (clickHouseConnection.ping(clickHouseConfig.connectTimeout())) {
+            if (!clickHouseConnection.ping(clickHouseConfig.connectTimeout())) {
                 throw new Exception();
             }
             

@@ -43,7 +43,7 @@ public class ValuesNativeInputFormat implements NativeInputFormat {
                     Validate.isTrue(lexer.character() == ','); // 验证逗号分隔
                 }
                 constIdxFlags.set(columnIdx); // 设置列索引标志
-                block.setObject(columnIdx, block.getColumn(columnIdx).type().deserializeText(lexer)); // 反序列化并设置对象
+                block.setObject(columnIdx, block.getColumn(columnIdx).type()); // 反序列化并设置对象
             }
             Validate.isTrue(lexer.character() == ')'); // 验证结束括号
             block.appendRow(); // 添加行

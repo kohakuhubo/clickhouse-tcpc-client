@@ -14,9 +14,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataTypeTuple implements IDataType<ClickHouseStruct> {
+public class DataTypeTuple implements IDataType<Object[]> {
 
-    public static DataTypeCreator<ClickHouseStruct> creator = (lexer, serverContext) -> {
+    public static DataTypeCreator<Object[]> creator = (lexer, serverContext) -> {
         Validate.isTrue(lexer.character() == '(');
         List<IDataType<?>> nestedDataTypes = new ArrayList<>();
 
@@ -50,60 +50,49 @@ public class DataTypeTuple implements IDataType<ClickHouseStruct> {
     }
 
     @Override
-    public ClickHouseStruct defaultValue() {
+    public Object[] defaultValue() {
         Object[] attrs = new Object[getNestedTypes().length];
         for (int i = 0; i < getNestedTypes().length; i++) {
             attrs[i] = getNestedTypes()[i].defaultValue();
         }
-        return new ClickHouseStruct("Tuple", attrs);
+        return attrs;
     }
 
     @Override
-    public Class<ClickHouseStruct> javaType() {
-        return ClickHouseStruct.class;
+    public Class<Object[]> javaType() {
+        return Object[].class;
     }
 
     @Override
-    public void serializeBinary(ClickHouseStruct data, BinarySerializer serializer) throws SQLException, IOException {
+    public void serializeBinary(Object[] data, BinarySerializer serializer) throws SQLException, IOException {
         for (int i = 0; i < getNestedTypes().length; i++) {
-            getNestedTypes()[i].serializeBinary(data.getAttributes()[i], serializer);
+            getNestedTypes()[i].serializeBinary(data[i], serializer);
         }
     }
 
     @Override
-    public void serializeBinaryBulk(ClickHouseStruct[] data, BinarySerializer serializer) throws SQLException, IOException {
+    public void serializeBinaryBulk(Object[][] data, BinarySerializer serializer) throws SQLException, IOException {
         for (int i = 0; i < getNestedTypes().length; i++) {
             Object[] elemsData = new Object[data.length];
             for (int row = 0; row < data.length; row++) {
-                elemsData[row] = data[row].getAttributes()[i];
+                elemsData[row] = data[row][i];
             }
             getNestedTypes()[i].serializeBinaryBulk(elemsData, serializer);
         }
     }
 
     @Override
-    public ClickHouseStruct deserializeBinary(BinaryDeserializer deserializer) throws SQLException, IOException {
+    public Object[] deserializeBinary(BinaryDeserializer deserializer) throws SQLException, IOException {
         Object[] attrs = new Object[getNestedTypes().length];
         for (int i = 0; i < getNestedTypes().length; i++) {
             attrs[i] = getNestedTypes()[i].deserializeBinary(deserializer);
         }
-        return new ClickHouseStruct("Tuple", attrs);
+        return attrs;
     }
 
     @Override
-    public ClickHouseStruct[] deserializeBinaryBulk(int rows, BinaryDeserializer deserializer) throws SQLException, IOException {
-        Object[][] rowsWithElems = getRowsWithElems(rows, deserializer);
-
-        ClickHouseStruct[] rowsData = new ClickHouseStruct[rows];
-        for (int row = 0; row < rows; row++) {
-            Object[] elemsData = new Object[getNestedTypes().length];
-
-            for (int elemIndex = 0; elemIndex < getNestedTypes().length; elemIndex++) {
-                elemsData[elemIndex] = rowsWithElems[elemIndex][row];
-            }
-            rowsData[row] = new ClickHouseStruct("Tuple", elemsData);
-        }
-        return rowsData;
+    public Object[][] deserializeBinaryBulk(int rows, BinaryDeserializer deserializer) throws SQLException, IOException {
+        return getRowsWithElems(rows, deserializer);
     }
 
     private Object[][] getRowsWithElems(int rows, BinaryDeserializer deserializer) throws IOException, SQLException {
