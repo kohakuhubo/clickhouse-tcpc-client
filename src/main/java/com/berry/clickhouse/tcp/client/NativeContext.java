@@ -193,11 +193,6 @@ public class NativeContext {
         private final ClickHouseConfig configure;
         
         /**
-         * Socket缓冲读取器
-         */
-        private SocketBuffedReader socketBuffedReader;
-        
-        /**
          * 列写入缓冲工厂
          */
         private ColumnWriterBufferFactory columnWriterBufferFactory;
@@ -214,13 +209,14 @@ public class NativeContext {
          */
         public ServerContext(long majorVersion, long minorVersion, long reversion,
                              ClickHouseConfig configure,
-                             ZoneId timeZone, String displayName) {
+                             ZoneId timeZone, String displayName, ColumnWriterBufferFactory columnWriterBufferFactory) {
             this.majorVersion = majorVersion;
             this.minorVersion = minorVersion;
             this.reversion = reversion;
             this.configure = configure;
             this.timeZone = timeZone;
             this.displayName = displayName;
+            this.columnWriterBufferFactory = columnWriterBufferFactory;
         }
 
         /**
@@ -284,15 +280,6 @@ public class NativeContext {
          */
         public ClickHouseConfig getConfigure() {
             return configure;
-        }
-
-        /**
-         * 获取Socket缓冲读取器
-         * 
-         * @return Socket缓冲读取器
-         */
-        public SocketBuffedReader getSocketBuffedReader() {
-            return socketBuffedReader;
         }
 
         /**

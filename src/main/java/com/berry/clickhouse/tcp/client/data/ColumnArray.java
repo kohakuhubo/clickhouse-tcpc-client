@@ -5,8 +5,10 @@ import com.berry.clickhouse.tcp.client.jdbc.ClickHouseArray;
 import com.berry.clickhouse.tcp.client.serde.BinarySerializer;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -34,11 +36,12 @@ public class ColumnArray extends AbstractColumn {
 
     @Override
     public void write(Object object) throws IOException, SQLException {
-        Object[] arr = ((ClickHouseArray) object).getArray(); // 获取数组
-        offsets.add(offsets.isEmpty() ? arr.length : offsets.get((offsets.size() - 1)) + arr.length); // 更新偏移量
-        for (Object field : arr) {
-            data.write(field); // 写入数组元素
+        int len = Array.getLength(object);
+        offsets.add(offsets.isEmpty() ? len : offsets.get((offsets.size() - 1)) + len); // 更新偏移量
+        for (int i = 0; i < len; i++) {
+            data.write(Array.get(object, i));// 写入数组元素
         }
+        addRowCnt();
     }
 
     @Override

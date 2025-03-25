@@ -83,6 +83,11 @@ public class DataTypeFixedString implements IDataType<CharSequence> {
     }
 
     @Override
+    public int byteSize() {
+        return n;
+    }
+
+    @Override
     public String defaultValue() {
         return defaultValue;
     }

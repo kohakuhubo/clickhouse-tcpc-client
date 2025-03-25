@@ -23,6 +23,11 @@ public class DataTypeDate32 implements IDataType<LocalDate> {
     }
 
     @Override
+    public int byteSize() {
+        return Integer.BYTES;
+    }
+
+    @Override
     public String name() {
         return "Date32"; // 返回数据类型名称
     }

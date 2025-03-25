@@ -21,6 +21,11 @@ public class DataTypeIPv6 implements IDataType<BigInteger> {
     }
 
     @Override
+    public int byteSize() {
+        return Long.BYTES;
+    }
+
+    @Override
     public BigInteger defaultValue() {
         return BigInteger.ZERO; // 返回默认值
     }

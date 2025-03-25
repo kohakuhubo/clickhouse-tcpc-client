@@ -43,6 +43,11 @@ public class DataTypeNullable implements IDataType {
     }
 
     @Override
+    public int byteSize() {
+        return this.nestedDataType.byteSize();
+    }
+
+    @Override
     public Object defaultValue() {
         return nestedDataType.defaultValue();
     }

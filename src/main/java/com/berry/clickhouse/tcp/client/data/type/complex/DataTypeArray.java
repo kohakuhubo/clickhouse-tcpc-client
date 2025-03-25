@@ -15,10 +15,12 @@ import com.berry.clickhouse.tcp.client.serde.BinaryDeserializer;
 import com.berry.clickhouse.tcp.client.serde.BinarySerializer;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -114,16 +116,21 @@ public class DataTypeArray implements IDataType<Object> {
      */
     @Override
     public void serializeBinary(Object data, BinarySerializer serializer) throws SQLException, IOException {
-        Object[] value;
         if (data.getClass().isArray()) {
-            value = (Object[]) data;
-        } else if (data instanceof List) {
-            value = ((List<?>) data).toArray();
+            int len = Array.getLength(data);
+            for (int i = 0; i < len; i++) {
+                getElemDataType().serializeBinary(Array.get(data, i), serializer);// 写入数组元素
+            }
+        } else if (data instanceof Collection) {
+            Collection<?> c = (Collection<?>) data;
+            for (Object object : c) {
+                getElemDataType().serializeBinary(object, serializer);
+            }
         } else {
-            value = ((ClickHouseArray) data).getArray();
-        }
-        for (Object f : value) {
-            getElemDataType().serializeBinary(f, serializer);
+            Object[] value = ((ClickHouseArray) data).getArray();
+            for (Object f : value) {
+                getElemDataType().serializeBinary(f, serializer);
+            }
         }
     }
 

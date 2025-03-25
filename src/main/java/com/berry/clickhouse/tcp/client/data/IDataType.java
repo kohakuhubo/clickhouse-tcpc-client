@@ -154,11 +154,11 @@ public interface IDataType<CK> {
             }
         } else {
             if (length >= byteSize) {
-                for (int i = (offset + byteSize); i >= 0; i--) {
+                for (int i = (offset + byteSize - 1); i >= 0; i--) {
                     serializer.writeByte(bytes[i]);
                 }
             } else {
-                for (int i = (offset + length); i >= 0; i--) {
+                for (int i = (offset + length - 1); i >= 0; i--) {
                     serializer.writeByte(bytes[i]);
                 }
                 int zSize = (byteSize - length);

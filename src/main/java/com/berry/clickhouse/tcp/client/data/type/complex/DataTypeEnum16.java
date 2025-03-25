@@ -59,6 +59,11 @@ public class DataTypeEnum16 implements IDataType<String> {
     }
 
     @Override
+    public int byteSize() {
+        return Short.BYTES;
+    }
+
+    @Override
     public String defaultValue() {
         return names[0];
     }

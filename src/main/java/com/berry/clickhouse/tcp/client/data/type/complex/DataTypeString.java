@@ -93,7 +93,7 @@ public class DataTypeString implements IDataType<CharSequence> {
 
     @Override
     public void serializeBinary(byte[] bytes, int offset, int length, BinarySerializer serializer) throws SQLException, IOException {
-        serializer.writeInt(length);
+        serializer.writeVarInt(length);
         serializer.writeBytes(bytes, offset, length);
     }
 

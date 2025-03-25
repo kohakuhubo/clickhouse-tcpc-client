@@ -47,6 +47,7 @@ public class ColumnMap extends AbstractColumn {
             for (Object value : dataMap.values()) {
                 columnDataArray[1].write(value); // 写入值
             }
+            addRowCnt();
         }
     }
 

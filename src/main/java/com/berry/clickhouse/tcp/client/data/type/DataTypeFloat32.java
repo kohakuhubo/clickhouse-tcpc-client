@@ -20,6 +20,11 @@ public class DataTypeFloat32 implements IDataType<Float> {
     }
 
     @Override
+    public int byteSize() {
+        return Float.BYTES;
+    }
+
+    @Override
     public Float defaultValue() {
         return 0.0F; // 返回默认值
     }

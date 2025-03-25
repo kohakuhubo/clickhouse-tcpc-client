@@ -60,6 +60,11 @@ public class DataTypeEnum8 implements IDataType<String> {
     }
 
     @Override
+    public int byteSize() {
+        return Byte.BYTES;
+    }
+
+    @Override
     public String defaultValue() {
         return names[0];
     }

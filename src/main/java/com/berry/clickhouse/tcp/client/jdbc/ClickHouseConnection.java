@@ -4,6 +4,7 @@ import com.berry.clickhouse.tcp.client.NativeClient;
 import com.berry.clickhouse.tcp.client.NativeContext;
 import com.berry.clickhouse.tcp.client.SessionState;
 import com.berry.clickhouse.tcp.client.data.Block;
+import com.berry.clickhouse.tcp.client.data.ColumnWriterBufferFactory;
 import com.berry.clickhouse.tcp.client.log.Logger;
 import com.berry.clickhouse.tcp.client.log.LoggerFactory;
 import com.berry.clickhouse.tcp.client.misc.Validate;
@@ -334,7 +335,7 @@ public class ClickHouseConnection {
             ZoneId timeZone = ZoneId.of(response.serverTimeZone());
             return new NativeContext.ServerContext(
                     response.majorVersion(), response.minorVersion(), response.reversion(),
-                    configure, timeZone, response.serverDisplayName());
+                    configure, timeZone, response.serverDisplayName(), ColumnWriterBufferFactory.getInstance(configure));
         } catch (SQLException rethrows) {
             nativeClient.silentDisconnect();
             throw rethrows;

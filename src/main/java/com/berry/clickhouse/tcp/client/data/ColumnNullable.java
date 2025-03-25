@@ -40,6 +40,7 @@ public class ColumnNullable extends AbstractColumn {
             nullableSign.add((byte) 0); // 添加非空标志
             data.write(object); // 写入实际值
         }
+        addRowCnt();
     }
 
     @Override

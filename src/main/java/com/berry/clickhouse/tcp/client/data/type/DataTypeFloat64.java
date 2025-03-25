@@ -20,6 +20,11 @@ public class DataTypeFloat64 implements IDataType<Double> {
     }
 
     @Override
+    public int byteSize() {
+        return Double.BYTES;
+    }
+
+    @Override
     public Double defaultValue() {
         return 0.0D; // 返回默认值
     }

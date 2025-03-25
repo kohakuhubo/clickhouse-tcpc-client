@@ -20,6 +20,11 @@ public class DataTypeIPv4 implements IDataType<Long> {
     }
 
     @Override
+    public int byteSize() {
+        return Integer.BYTES;
+    }
+
+    @Override
     public Long defaultValue() {
         return 0L; // 返回默认值
     }

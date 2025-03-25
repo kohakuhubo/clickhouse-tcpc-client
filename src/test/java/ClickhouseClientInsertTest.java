@@ -6,12 +6,10 @@ import com.berry.clickhouse.tcp.client.util.ByteConverter;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,7 +34,7 @@ public class ClickhouseClientInsertTest {
         ClickHouseClient client = new ClickHouseClient.Builder()
                 .clickHouseConfig(clickHouseConfig).build();
         //创建Block
-        Block block = client.createBlock("all_data_types");
+        Block block = client.createBlock("all_data_types_v1");
         //获取id的Column并写入数据
         IColumn column = block.getColumn("id");
         byte[] bytes = ByteConverter.intToByteArray(1, true);
@@ -57,6 +55,11 @@ public class ClickhouseClientInsertTest {
         column.writeInt(bytes, 0, bytes.length);
         bytes = ByteConverter.intToByteArray(3, true);
         column.writeInt(bytes, 0, bytes.length);
+
+        //获取is_active的Column并写入数据
+        column = block.getColumn("salary");
+        column.write(1.09F);
+        column.write(2.09F);
 
         //获取is_active的Column并写入数据
         column = block.getColumn("is_active");
@@ -82,11 +85,6 @@ public class ClickhouseClientInsertTest {
         column.write(System.currentTimeMillis());
         column.write(System.currentTimeMillis());
 
-        //获取created_time的Column并写入数据
-        column = block.getColumn("created_time");
-        column.write(System.currentTimeMillis());
-        column.write(System.currentTimeMillis());
-
         //获取data的Column并写入数据
         column = block.getColumn("data");
         column.write(new int[]{1, 2, 3});
@@ -104,8 +102,8 @@ public class ClickhouseClientInsertTest {
 
         //获取nested_data.id的Column并写入数据
         column = block.getColumn("nested_data.id");
-        column.write(new int[]{1, 2, 3});
-        column.write(new int[]{1, 2, 3});
+        column.write(new long[]{1, 2, 3});
+        column.write(new long[]{1, 2, 3});
 
         //获取nested_data.value的Column并写入数据
         column = block.getColumn("nested_data.value");
@@ -122,11 +120,6 @@ public class ClickhouseClientInsertTest {
         column.write(UUID.randomUUID());
         column.write(UUID.randomUUID());
 
-        //获取uuid_value的Column并写入数据
-        column = block.getColumn("uuid_value");
-        column.write(UUID.randomUUID());
-        column.write(UUID.randomUUID());
-
         //获取low_cardinality_value的Column并写入数据
         column = block.getColumn("low_cardinality_value");
         column.write("CN");
@@ -134,8 +127,8 @@ public class ClickhouseClientInsertTest {
 
         //获取int8_value的Column并写入数据
         column = block.getColumn("int8_value");
-        column.write(0);
-        column.write(1);
+        column.write((byte) 0);
+        column.write((byte) 1);
 
         //获取int16_value的Column并写入数据
         column = block.getColumn("int16_value");
@@ -159,43 +152,28 @@ public class ClickhouseClientInsertTest {
 
         //获取uint16_value的Column并写入数据
         column = block.getColumn("uint16_value");
-        column.write(Short.MIN_VALUE);
-        column.write(Short.MAX_VALUE);
-
-        //获取uint32_value的Column并写入数据
-        column = block.getColumn("uint32_value");
         column.write(Integer.MIN_VALUE);
         column.write(Integer.MAX_VALUE);
 
         //获取uint32_value的Column并写入数据
-        column = block.getColumn("uint64_value");
+        column = block.getColumn("uint32_value");
+        column.write(Long.MIN_VALUE);
         column.write(Long.MAX_VALUE);
+
+        //获取uint32_value的Column并写入数据
+        column = block.getColumn("uint64_value");
+        column.write(new BigInteger("12345678901234567890"));
         column.write(new BigInteger("12345678901234567890"));
 
         //获取float64_value的Column并写入数据
         column = block.getColumn("float64_value");
-        column.write(Float.MIN_VALUE);
-        column.write(Float.MAX_VALUE);
+        column.write(Double.MIN_VALUE);
+        column.write(Double.MAX_VALUE);
 
         //获取date_time64_value的Column并写入数据
         column = block.getColumn("date_time64_value");
         column.write(ZonedDateTime.now());
         column.write(ZonedDateTime.now());
-
-        //获取avg_salary的Column并写入数据
-        column = block.getColumn("avg_salary");
-        column.write(Float.MIN_VALUE);
-        column.write(Float.MAX_VALUE);
-
-        //获取sum_salary的Column并写入数据
-        column = block.getColumn("sum_salary");
-        column.write(Float.MIN_VALUE);
-        column.write(Float.MAX_VALUE);
-
-        //获取count_value的Column并写入数据
-        column = block.getColumn("count_value");
-        column.write(Integer.MIN_VALUE);
-        column.write(Integer.MAX_VALUE);
 
         //获取min_salary的Column并写入数据
         column = block.getColumn("min_salary");
@@ -206,11 +184,6 @@ public class ClickhouseClientInsertTest {
         column = block.getColumn("max_salary");
         column.write(Float.MIN_VALUE);
         column.write(Float.MAX_VALUE);
-
-        //获取group_concat_value的Column并写入数据
-        column = block.getColumn("group_concat_value");
-        column.write("1991");
-        column.write("1988");
 
         //插入
         client.insert(block);

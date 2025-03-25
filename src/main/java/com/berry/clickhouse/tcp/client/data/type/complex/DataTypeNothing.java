@@ -25,6 +25,11 @@ public class DataTypeNothing implements IDataType<Object> {
     }
 
     @Override
+    public int byteSize() {
+        return Byte.BYTES;
+    }
+
+    @Override
     public Object defaultValue() {
         return null;
     }

@@ -18,7 +18,7 @@ public class ClickHouseDefines {
     public static final int COMPRESSION_HEADER_LENGTH = 9; // 压缩头长度
     public static final int CHECKSUM_LENGTH = 16; // 校验和长度
 
-    public static boolean COMPRESSION = true; // 是否启用压缩
+    public static boolean COMPRESSION = false; // 是否启用压缩
 
     public static int SOCKET_SEND_BUFFER_BYTES = 1024 * 1024; // 套接字发送缓冲区大小
     public static int SOCKET_RECV_BUFFER_BYTES = 1024 * 1024; // 套接字接收缓冲区大小

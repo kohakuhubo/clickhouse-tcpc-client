@@ -22,4 +22,9 @@ public interface BaseDataTypeInt64<CK> extends BaseDataTypeInt<CK> {
         }
         return b;
     }
+
+    @Override
+    default int byteSize() {
+        return Long.BYTES;
+    }
 }

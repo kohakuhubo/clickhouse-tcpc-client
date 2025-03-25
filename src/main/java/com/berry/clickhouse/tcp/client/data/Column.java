@@ -27,6 +27,7 @@ public class Column extends AbstractColumn {
     @Override
     public void write(Object object) throws IOException, SQLException {
         ((IDataType) type()).serializeBinary(object, buffer.column); // 将对象序列化为二进制格式
+        addRowCnt();
     }
 
     @Override

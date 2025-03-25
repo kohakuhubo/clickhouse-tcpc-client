@@ -34,6 +34,12 @@ public class DataTypeLowCardinality implements IDataType {
     }
 
     @Override
+    public int byteSize() {
+        return this.nestedDataType.byteSize();
+    }
+
+
+    @Override
     public Object defaultValue() {
         return this.nestedDataType.defaultValue();
     }

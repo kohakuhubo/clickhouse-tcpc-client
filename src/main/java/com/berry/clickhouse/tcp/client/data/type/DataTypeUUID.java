@@ -22,6 +22,11 @@ public class DataTypeUUID implements IDataType<UUID> {
     }
 
     @Override
+    public int byteSize() {
+        return 16;
+    }
+
+    @Override
     public UUID defaultValue() {
         return null; // 返回默认值
     }

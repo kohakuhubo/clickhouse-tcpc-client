@@ -37,6 +37,11 @@ public class DataTypeAggregateFunction implements IDataType<Object> {
     }
 
     @Override
+    public int byteSize() {
+        return nestedType.byteSize();
+    }
+
+    @Override
     public Object defaultValue() {
         return nestedType.defaultValue();
     }

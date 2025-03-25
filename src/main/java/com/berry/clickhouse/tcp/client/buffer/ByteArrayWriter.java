@@ -33,10 +33,10 @@ public class ByteArrayWriter implements BuffedWriter, BuffedReader {
      * @param recycleBuffer 回收缓冲区的消费者
      */
     public ByteArrayWriter(int freeListSize, Supplier<ByteBuffer> allocateBuffer, Consumer<ByteBuffer> recycleBuffer) {
-        reuseOrAllocateByteBuffer(); // 复用或分配字节缓冲区
         this.freeListSize = freeListSize; // 设置空闲缓冲区大小
         this.allocateBuffer = allocateBuffer; // 设置分配缓冲区的供应商
         this.recycleBuffer = recycleBuffer; // 设置回收缓冲区的消费者
+        reuseOrAllocateByteBuffer(); // 复用或分配字节缓冲区
     }
 
     public ByteArrayWriter(Supplier<ByteBuffer> allocateBuffer, Consumer<ByteBuffer> recycleBuffer) {
@@ -47,11 +47,6 @@ public class ByteArrayWriter implements BuffedWriter, BuffedReader {
     public void writeBinary(byte byt) throws IOException {
         flushToTarget(false); // 刷新到目标
         buffer.put(byt); // 写入字节
-    }
-
-    @Override
-    public void writeBinary(byte[] bytes) throws IOException {
-        writeBinary(bytes, 0, bytes.length); // 写入字节数组
     }
 
     @Override
@@ -66,29 +61,6 @@ public class ByteArrayWriter implements BuffedWriter, BuffedReader {
             length -= num; // 更新长度
         }
         buffer.put(bytes, offset, length); // 写入剩余字节
-    }
-
-    @Override
-    public void writeBinaryReverse(byte[] bytes) throws IOException {
-        writeBinaryReverse(bytes, 0, bytes.length);
-    }
-
-    @Override
-    public void writeBinaryReverse(byte[] bytes, int offset, int length) throws IOException {
-        if (length <= 0)
-            return;
-
-        //写入前检查内存
-        flushToTarget(false);
-        while (buffer.remaining() < length) {
-            int num = buffer.remaining();
-            writeReverse(bytes, offset, num);
-            flushToTarget(true);
-
-            length -= num;
-        }
-
-        writeReverse(bytes, offset, length);
     }
 
     @Override

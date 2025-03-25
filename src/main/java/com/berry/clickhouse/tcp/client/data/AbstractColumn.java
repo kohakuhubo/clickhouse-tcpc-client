@@ -79,16 +79,19 @@ public abstract class AbstractColumn implements IColumn {
     @Override
     public void write(byte[] bytes, int offset, int length) throws IOException, SQLException {
         type().serializeBinary(bytes, offset, length, buffer.column);
+        addRowCnt();
     }
 
     @Override
     public void writeInt(byte[] bytes, int offset, int length, boolean isLittleEndian) throws IOException, SQLException {
         type().serializeIntBinary(bytes, offset, length, isLittleEndian, buffer.column);
+        addRowCnt();
     }
 
     @Override
     public void write(byte byt) throws IOException, SQLException {
         type().serializeByteBinary(byt, buffer.column);
+        addRowCnt();
     }
 
     @Override

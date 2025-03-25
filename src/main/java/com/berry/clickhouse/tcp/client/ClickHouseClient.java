@@ -50,9 +50,9 @@ public class ClickHouseClient {
 
     /**
      * 私有构造方法，通过Builder模式创建实例
-     * 
-     * @param pool ClickHouse连接池
-     * @param serverContext 服务器上下文信息
+     *
+     * @param pool            ClickHouse连接池
+     * @param serverContext   服务器上下文信息
      * @param metaDataManager 表元数据管理器
      */
     private ClickHouseClient(GenericObjectPool<ClickHouseConnection> pool, NativeContext.ServerContext serverContext,
@@ -71,17 +71,17 @@ public class ClickHouseClient {
          * ClickHouse连接池
          */
         private GenericObjectPool<ClickHouseConnection> pool;
-        
+
         /**
          * 服务器上下文信息
          */
         private NativeContext.ServerContext serverContext;
-        
+
         /**
          * 表元数据管理器
          */
         private ClickHouseTableMetaDataManager metaDataManager;
-        
+
         /**
          * ClickHouse配置信息
          */
@@ -96,7 +96,7 @@ public class ClickHouseClient {
 
         /**
          * 添加表元数据信息
-         * 
+         *
          * @param metaData 表元数据
          * @return Builder实例，支持链式调用
          */
@@ -107,7 +107,7 @@ public class ClickHouseClient {
 
         /**
          * 设置ClickHouse配置信息
-         * 
+         *
          * @param val ClickHouse配置
          * @return Builder实例，支持链式调用
          */
@@ -118,7 +118,7 @@ public class ClickHouseClient {
 
         /**
          * 构建ClickHouseClient实例
-         * 
+         *
          * @return 新创建的ClickHouseClient实例
          * @throws Exception 如果连接失败或配置无效
          */
@@ -128,7 +128,7 @@ public class ClickHouseClient {
             if (!clickHouseConnection.ping(clickHouseConfig.connectTimeout())) {
                 throw new Exception();
             }
-            
+
             // 初始化列写入缓冲工厂
             ColumnWriterBufferFactory.getInstance(clickHouseConfig);
             serverContext = clickHouseConnection.serverContext();
@@ -148,7 +148,7 @@ public class ClickHouseClient {
 
     /**
      * 获取表的样本数据块，用于了解表结构
-     * 
+     *
      * @param tableName 表名
      * @return 表结构的样本数据块
      * @throws Exception 如果获取失败
@@ -157,17 +157,20 @@ public class ClickHouseClient {
         ClickHouseConnection clickHouseConnection = null;
         try {
             clickHouseConnection = acquireConnection();
-            return clickHouseConnection.getSampleBlock(String.format(GET_SAMPLE_BLOCK_SQL, tableName));
-        } finally {
+            Block block = clickHouseConnection.getSampleBlock(String.format(GET_SAMPLE_BLOCK_SQL, tableName));
+            block.setConnection(clickHouseConnection);
+            return block;
+        } catch (Exception e) {
             if (null != clickHouseConnection) {
                 returnConnection(clickHouseConnection);
             }
+            throw e;
         }
     }
 
     /**
      * 为指定表创建一个空的数据块
-     * 
+     *
      * @param tableName 表名
      * @return 为指定表创建的空数据块
      * @throws Exception 如果创建失败
@@ -187,13 +190,13 @@ public class ClickHouseClient {
 
     /**
      * 创建数据块结果集
-     * 
-     * @param block 数据块
-     * @param buffer 映射字节缓冲区
-     * @param enableCompress 是否启用压缩
+     *
+     * @param block           数据块
+     * @param buffer          映射字节缓冲区
+     * @param enableCompress  是否启用压缩
      * @param reserveDiffType 是否保留不同类型
-     * @param exclude 要排除的列名集合
-     * @param serializeCols 需要序列化的列名集合
+     * @param exclude         要排除的列名集合
+     * @param serializeCols   需要序列化的列名集合
      * @return 数据块结果集
      */
     public BlockResultSet createBlockResultSet(Block block, MappedByteBuffer buffer
@@ -203,13 +206,13 @@ public class ClickHouseClient {
 
     /**
      * 创建数据块结果集，通过表名
-     * 
-     * @param tableName 表名
-     * @param buffer 映射字节缓冲区
-     * @param enableCompress 是否启用压缩
+     *
+     * @param tableName       表名
+     * @param buffer          映射字节缓冲区
+     * @param enableCompress  是否启用压缩
      * @param reserveDiffType 是否保留不同类型
-     * @param exclude 要排除的列名集合
-     * @param serializeCols 需要序列化的列名集合
+     * @param exclude         要排除的列名集合
+     * @param serializeCols   需要序列化的列名集合
      * @return 数据块结果集
      * @throws Exception 如果创建失败
      */
@@ -225,7 +228,7 @@ public class ClickHouseClient {
 
     /**
      * 从连接池获取一个连接
-     * 
+     *
      * @return ClickHouse连接
      * @throws Exception 如果获取连接失败
      */
@@ -237,7 +240,7 @@ public class ClickHouseClient {
 
     /**
      * 将连接归还到连接池
-     * 
+     *
      * @param connection 要归还的连接
      * @throws Exception 如果归还连接失败
      */
@@ -249,7 +252,7 @@ public class ClickHouseClient {
 
     /**
      * 执行查询
-     * 
+     *
      * @param query SQL查询语句
      * @return 查询结果
      * @throws SQLException 如果查询执行失败
@@ -260,8 +263,8 @@ public class ClickHouseClient {
 
     /**
      * 执行查询，可指定是否序列化结果
-     * 
-     * @param query SQL查询语句
+     *
+     * @param query     SQL查询语句
      * @param serialize 是否序列化结果
      * @return 查询结果
      * @throws Exception 如果查询执行失败
@@ -280,7 +283,7 @@ public class ClickHouseClient {
 
     /**
      * 插入数据块
-     * 
+     *
      * @param block 要插入的数据块
      * @throws Exception 如果插入失败
      */
@@ -290,16 +293,17 @@ public class ClickHouseClient {
 
     /**
      * 插入数据块，可指定是否清理数据块
-     * 
+     *
      * @param block 要插入的数据块
      * @param clean 是否在插入后清理数据块
      * @throws Exception 如果插入失败
      */
     public void insert(Block block, boolean clean) throws Exception {
-        ClickHouseConnection clickHouseConnection = null;
+        ClickHouseConnection clickHouseConnection = block.getConnection();
         boolean result = false;
         try {
-            clickHouseConnection = acquireConnection();
+            if (null == clickHouseConnection)
+                clickHouseConnection = acquireConnection();
             clickHouseConnection.sendInsertRequest(block);
             result = true;
         } finally {
@@ -315,7 +319,7 @@ public class ClickHouseClient {
 
     /**
      * 清理数据块资源
-     * 
+     *
      * @param block 要清理的数据块
      */
     public void cleanBlock(Block block) {
@@ -324,7 +328,7 @@ public class ClickHouseClient {
 
     /**
      * 关闭客户端，释放连接池资源
-     * 
+     *
      * @throws Exception 如果关闭失败
      */
     public void close() throws Exception {

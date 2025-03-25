@@ -44,6 +44,11 @@ public class DataTypeDateTime implements IDataType<ZonedDateTime> {
     }
 
     @Override
+    public int byteSize() {
+        return Integer.BYTES;
+    }
+
+    @Override
     public ZonedDateTime defaultValue() {
         return defaultValue;
     }

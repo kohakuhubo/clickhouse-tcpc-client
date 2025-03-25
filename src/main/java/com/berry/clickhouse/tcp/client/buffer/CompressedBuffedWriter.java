@@ -45,11 +45,6 @@ public class CompressedBuffedWriter implements BuffedWriter, BytesHelper {
     }
 
     @Override
-    public void writeBinary(byte[] bytes) throws IOException {
-        // 该方法未实现
-    }
-
-    @Override
     public void writeBinary(byte[] bytes, int offset, int length) throws IOException {
         while (remaining() < length) {
             int num = remaining(); // 获取剩余空间
@@ -62,16 +57,6 @@ public class CompressedBuffedWriter implements BuffedWriter, BytesHelper {
         System.arraycopy(bytes, offset, writtenBuf, position, length); // 写入剩余字节
         position += length; // 更新写入位置
         flushToTarget(false); // 刷新到目标
-    }
-
-    @Override
-    public void writeBinaryReverse(byte[] bytes) throws IOException {
-
-    }
-
-    @Override
-    public void writeBinaryReverse(byte[] bytes, int offset, int length) throws IOException {
-
     }
 
     @Override

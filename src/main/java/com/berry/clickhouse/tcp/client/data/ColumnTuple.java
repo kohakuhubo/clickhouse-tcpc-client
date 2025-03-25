@@ -5,6 +5,7 @@ import com.berry.clickhouse.tcp.client.jdbc.ClickHouseStruct;
 import com.berry.clickhouse.tcp.client.serde.BinarySerializer;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.sql.SQLException;
 
 /**
@@ -34,10 +35,10 @@ public class ColumnTuple extends AbstractColumn {
 
     @Override
     public void write(Object object) throws IOException, SQLException {
-        ClickHouseStruct tuple = (ClickHouseStruct) object; // 将对象转换为ClickHouseStruct
         for (int i = 0; i < columnDataArray.length; i++) {
-            columnDataArray[i].write(tuple.getAttributes()[i]); // 写入元组字段
+            columnDataArray[i].write(Array.get(object, i));// 写入元组字段
         }
+        addRowCnt();
     }
 
     @Override

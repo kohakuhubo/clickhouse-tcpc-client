@@ -32,6 +32,7 @@ public class DataTypeDecimal implements IDataType<BigDecimal>, BytesHelper {
     private final int scale;
     private final BigDecimal scaleFactor;
     private final int nobits;
+    private final int byteSize;
 
     // see https://clickhouse.tech/docs/en/sql-reference/data-types/decimal/
     public DataTypeDecimal(String name, int precision, int scale) {
@@ -41,12 +42,16 @@ public class DataTypeDecimal implements IDataType<BigDecimal>, BytesHelper {
         this.scaleFactor = BigDecimal.valueOf(Math.pow(10, scale));
         if (this.precision <= 9) {
             this.nobits = 32;
+            this.byteSize = 4;
         } else if (this.precision <= 18) {
             this.nobits = 64;
+            this.byteSize = 8;
         } else if (this.precision <= 38) {
             this.nobits = 128;
+            this.byteSize = 16;
         } else if (this.precision <= 76) {
             this.nobits = 256;
+            this.byteSize = 32;
         } else {
             throw new IllegalArgumentException(String.format(Locale.ENGLISH,
                     "Precision[%d] is out of boundary.", precision));
@@ -56,6 +61,11 @@ public class DataTypeDecimal implements IDataType<BigDecimal>, BytesHelper {
     @Override
     public String name() {
         return this.name;
+    }
+
+    @Override
+    public int byteSize() {
+        return this.byteSize;
     }
 
     @Override

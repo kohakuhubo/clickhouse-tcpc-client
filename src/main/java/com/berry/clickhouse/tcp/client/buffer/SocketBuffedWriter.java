@@ -28,23 +28,8 @@ public class SocketBuffedWriter implements BuffedWriter {
     }
 
     @Override
-    public void writeBinary(byte[] bytes) throws IOException {
-        // 该方法未实现
-    }
-
-    @Override
     public void writeBinary(byte[] bytes, int offset, int length) throws IOException {
         out.write(bytes, offset, length); // 写入字节数组
-    }
-
-    @Override
-    public void writeBinaryReverse(byte[] bytes) throws IOException {
-        // 该方法未实现
-    }
-
-    @Override
-    public void writeBinaryReverse(byte[] bytes, int offset, int length) throws IOException {
-        // 该方法未实现
     }
 
     @Override

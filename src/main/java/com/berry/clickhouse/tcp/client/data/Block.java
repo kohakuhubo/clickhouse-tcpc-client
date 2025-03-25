@@ -8,8 +8,8 @@ package com.berry.clickhouse.tcp.client.data;
 import com.berry.clickhouse.tcp.client.buffer.EmptyReadWriter;
 import com.berry.clickhouse.tcp.client.NativeContext;
 import com.berry.clickhouse.tcp.client.data.BlockSettings.Setting;
+import com.berry.clickhouse.tcp.client.jdbc.ClickHouseConnection;
 import com.berry.clickhouse.tcp.client.jdbc.ClickHouseTableMetaData;
-import com.berry.clickhouse.tcp.client.misc.CollectionUtil;
 import com.berry.clickhouse.tcp.client.misc.Validate;
 import com.berry.clickhouse.tcp.client.serde.BinaryDeserializer;
 import com.berry.clickhouse.tcp.client.serde.BinarySerializer;
@@ -55,6 +55,11 @@ public class Block {
     private ClickHouseTableMetaData tableMetaData;
 
     /**
+     * 链接
+     */
+    private ClickHouseConnection connection;
+
+    /**
      * 从列数组创建数据块
      * 
      * @param columns 列数组
@@ -68,7 +73,7 @@ public class Block {
         for (int i = 0; i < columns.length; i++) {
             IColumn column = columns[i];
             if (null == column.getColumnWriterBuffer()) {
-                column.setColumnWriterBuffer(factory.getBuffer(column));
+                column.setColumnWriterBuffer(factory.getBuffer(column), factory);
             }
             columnMap.put(column.name(), column);
         }
@@ -98,7 +103,7 @@ public class Block {
             IDataType<?> dataType = DataTypeFactory.get(types.get(i), serverContext);
             String columnName = names.get(i);
             IColumn column = ColumnFactory.createColumn(names.get(i), dataType, namesBytes[i], null);
-            column.setColumnWriterBuffer(factory.getBuffer(column));
+            column.setColumnWriterBuffer(factory.getBuffer(column), factory);
             columns[i] = column;
             columnMap.put(columnName, column);
         }
@@ -201,7 +206,7 @@ public class Block {
                 IDataType<?> dataType = DataTypeFactory.get(type, serverContext);
                 IColumn column = ColumnFactory.createColumn(name, dataType, BinarySerializerUtil.serializeString(name), null);
                 if (rowCnt > 0) {
-                    column.setColumnWriterBuffer(factory.getBuffer(column));
+                    column.setColumnWriterBuffer(factory.getBuffer(column), factory);
                     column.read(rowCnt, deserializer);
                     column.addRowCnt(rowCnt);
 
@@ -267,6 +272,14 @@ public class Block {
             nameAndPositions.put(columns[i].name(), i + 1);
             placeholderIndexes[i] = i;
         }
+    }
+
+    public ClickHouseConnection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(ClickHouseConnection connection) {
+        this.connection = connection;
     }
 
     public int rowCnt() {
@@ -356,7 +369,7 @@ public class Block {
     }
 
     public IColumn getColumn(String columnName) throws SQLException {
-        return columns[getPositionByName(columnName)];
+        return columns[getPositionByName(columnName) - 1];
     }
 
     public int getPositionByName(String columnName) throws SQLException {
@@ -382,7 +395,7 @@ public class Block {
             if (writeBuffer != null) {
                 bufferFactory.recycleBuffer(writeBuffer);
             }
-            column.setColumnWriterBuffer(bufferFactory.getBuffer(column));
+            column.setColumnWriterBuffer(bufferFactory.getBuffer(column), bufferFactory);
         }
     }
 

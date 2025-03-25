@@ -137,6 +137,11 @@ public class DataTypeDateTime64 implements IDataType<ZonedDateTime> {
         return name;
     }
 
+    @Override
+    public int byteSize() {
+        return Long.BYTES;
+    }
+
     /**
      * 获取数据类型默认值
      * 

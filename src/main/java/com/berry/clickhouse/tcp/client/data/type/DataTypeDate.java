@@ -28,6 +28,11 @@ public class DataTypeDate implements IDataType<LocalDate> {
     }
 
     @Override
+    public int byteSize() {
+        return Short.BYTES;
+    }
+
+    @Override
     public LocalDate defaultValue() {
         return DEFAULT_VALUE; // 返回默认值
     }
