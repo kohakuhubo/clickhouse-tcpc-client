@@ -9,7 +9,7 @@ import com.berry.clickhouse.tcp.client.log.Logger;
 import com.berry.clickhouse.tcp.client.log.LoggerFactory;
 import com.berry.clickhouse.tcp.client.misc.Validate;
 import com.berry.clickhouse.tcp.client.protocol.HelloResponse;
-import com.berry.clickhouse.tcp.client.settings.ClickHouseConfig;
+import com.berry.clickhouse.tcp.client.settings.ClickHouseClientConfig;
 import com.berry.clickhouse.tcp.client.settings.ClickHouseDefines;
 import com.berry.clickhouse.tcp.client.stream.QueryResult;
 
@@ -38,7 +38,7 @@ public class ClickHouseConnection {
     private static final Pattern VALUES_REGEX = Pattern.compile("[Vv][Aa][Ll][Uu][Ee][Ss]\\s*\\(");
 
     private final AtomicBoolean isClosed; // 连接是否关闭的状态
-    private final AtomicReference<ClickHouseConfig> cfg; // 连接配置
+    private final AtomicReference<ClickHouseClientConfig> cfg; // 连接配置
     private final AtomicReference<SessionState> state = new AtomicReference<>(SessionState.IDLE); // 当前会话状态
     private volatile NativeContext nativeCtx; // 原生上下文
 
@@ -48,7 +48,7 @@ public class ClickHouseConnection {
      * @param cfg 连接配置
      * @param nativeCtx 原生上下文
      */
-    protected ClickHouseConnection(ClickHouseConfig cfg, NativeContext nativeCtx) {
+    protected ClickHouseConnection(ClickHouseClientConfig cfg, NativeContext nativeCtx) {
         this.isClosed = new AtomicBoolean(false);
         this.cfg = new AtomicReference<>(cfg);
         this.nativeCtx = nativeCtx;
@@ -57,9 +57,9 @@ public class ClickHouseConnection {
     /**
      * 获取连接配置
      * 
-     * @return ClickHouseConfig对象
+     * @return 对象
      */
-    public ClickHouseConfig cfg() {
+    public ClickHouseClientConfig cfg() {
         return cfg.get();
     }
 
@@ -111,7 +111,7 @@ public class ClickHouseConnection {
      */
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
         try {
-            cfg.set(ClickHouseConfig.Builder.builder(cfg.get()).withProperties(properties).build());
+            cfg.set(ClickHouseClientConfig.Builder.builder(cfg.get()).withProperties(properties).build());
         } catch (Exception ex) {
             Map<String, ClientInfoStatus> failed = new HashMap<>();
             for (Map.Entry<Object, Object> entry : properties.entrySet()) {
@@ -181,7 +181,7 @@ public class ClickHouseConnection {
      * @return 查询结果
      * @throws SQLException 如果发送查询请求时发生错误
      */
-    public QueryResult sendQueryRequest(final String query, ClickHouseConfig cfg, boolean lazy, boolean serialize) throws SQLException {
+    public QueryResult sendQueryRequest(final String query, ClickHouseClientConfig cfg, boolean lazy, boolean serialize) throws SQLException {
         Validate.isTrue(this.state.get() == SessionState.IDLE,
                 "Connection is currently waiting for an insert operation, check your previous InsertStatement.");
         NativeClient nativeClient = getHealthyNativeClient();
@@ -243,7 +243,7 @@ public class ClickHouseConnection {
      * @return ClickHouseConnection实例
      * @throws SQLException 如果创建连接时发生错误
      */
-    public static ClickHouseConnection createClickHouseConnection(ClickHouseConfig configure) throws SQLException {
+    public static ClickHouseConnection createClickHouseConnection(ClickHouseClientConfig configure) throws SQLException {
         return new ClickHouseConnection(configure, createNativeContext(configure));
     }
 
@@ -254,7 +254,7 @@ public class ClickHouseConnection {
      * @return NativeContext实例
      * @throws SQLException 如果创建上下文时发生错误
      */
-    private static NativeContext createNativeContext(ClickHouseConfig configure) throws SQLException {
+    private static NativeContext createNativeContext(ClickHouseClientConfig configure) throws SQLException {
         if (configure.hosts().size() == 1) {
             NativeClient nativeClient = NativeClient.connect(configure);
             return new NativeContext(clientContext(nativeClient, configure), serverContext(nativeClient, configure), nativeClient);
@@ -270,7 +270,7 @@ public class ClickHouseConnection {
      * @return NativeContext实例
      * @throws SQLException 如果创建上下文时发生错误
      */
-    private static NativeContext createFailoverNativeContext(ClickHouseConfig configure) throws SQLException {
+    private static NativeContext createFailoverNativeContext(ClickHouseClientConfig configure) throws SQLException {
         NativeClient nativeClient = null;
         SQLException lastException = null;
 
@@ -310,7 +310,7 @@ public class ClickHouseConnection {
      * @return ClientContext实例
      * @throws SQLException 如果创建上下文时发生错误
      */
-    private static NativeContext.ClientContext clientContext(NativeClient nativeClient, ClickHouseConfig configure) throws SQLException {
+    private static NativeContext.ClientContext clientContext(NativeClient nativeClient, ClickHouseClientConfig configure) throws SQLException {
         Validate.isTrue(nativeClient.address() instanceof InetSocketAddress);
         InetSocketAddress address = (InetSocketAddress) nativeClient.address();
         String clientName = configure.clientName();
@@ -326,7 +326,7 @@ public class ClickHouseConnection {
      * @return ServerContext实例
      * @throws SQLException 如果创建上下文时发生错误
      */
-    private static NativeContext.ServerContext serverContext(NativeClient nativeClient, ClickHouseConfig configure) throws SQLException {
+    private static NativeContext.ServerContext serverContext(NativeClient nativeClient, ClickHouseClientConfig configure) throws SQLException {
         try {
             long revision = ClickHouseDefines.CLIENT_REVISION;
             nativeClient.sendHello("client", revision, configure.database(), configure.user(), configure.password());

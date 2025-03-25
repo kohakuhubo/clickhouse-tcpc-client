@@ -5,7 +5,6 @@ import com.berry.clickhouse.tcp.client.buffer.DefaultBufferPoolManager;
 import com.berry.clickhouse.tcp.client.data.ColumnWriterBufferPoolManager;
 import com.berry.clickhouse.tcp.client.data.DefaultColumnWriterBufferPoolManager;
 import com.berry.clickhouse.tcp.client.jdbc.ClickhousePropertiesParser;
-import com.berry.clickhouse.tcp.client.misc.CollectionUtil;
 import com.berry.clickhouse.tcp.client.misc.StrUtil;
 
 import java.io.Serializable;
@@ -16,10 +15,10 @@ import java.util.*;
 import static com.berry.clickhouse.tcp.client.jdbc.ClickhousePropertiesParser.HOST_DELIMITER;
 
 /**
- * ClickHouseConfig类用于配置ClickHouse连接的各种参数
+ * 类用于配置ClickHouse连接的各种参数
  * 包括主机、端口、数据库、用户凭证等设置
  */
-public class ClickHouseConfig implements Serializable {
+public class ClickHouseClientConfig implements Serializable {
 
     private final String host; // 主机名
     private final List<String> hosts; // 主机列表
@@ -44,7 +43,7 @@ public class ClickHouseConfig implements Serializable {
     private final BufferPoolManager bufferPoolManager; // 缓冲池管理器
 
     /**
-     * ClickHouseConfig构造函数
+     * 构造函数
      * 
      * @param host 主机名
      * @param port 端口号
@@ -67,17 +66,17 @@ public class ClickHouseConfig implements Serializable {
      * @param columnWriterBufferPoolManager 列写入缓冲池管理器
      * @param bufferPoolManager 缓冲池管理器
      */
-    private ClickHouseConfig(String host, int port, String database, String user, String password,
-                             Duration queryTimeout, Duration connectTimeout, boolean tcpKeepAlive,
-                             boolean ssl, String sslMode, String charset, String clientName,
-                             Map<SettingKey, Serializable> settings,
-                             int connectionPoolMaxIdle,
-                             int connectionPoolMinIdle,
-                             int connectionPoolTotal,
-                             String serializedIPv4,
-                             String serializedIPv6,
-                             ColumnWriterBufferPoolManager columnWriterBufferPoolManager,
-                             BufferPoolManager bufferPoolManager) {
+    private ClickHouseClientConfig(String host, int port, String database, String user, String password,
+                                   Duration queryTimeout, Duration connectTimeout, boolean tcpKeepAlive,
+                                   boolean ssl, String sslMode, String charset, String clientName,
+                                   Map<SettingKey, Serializable> settings,
+                                   int connectionPoolMaxIdle,
+                                   int connectionPoolMinIdle,
+                                   int connectionPoolTotal,
+                                   String serializedIPv4,
+                                   String serializedIPv6,
+                                   ColumnWriterBufferPoolManager columnWriterBufferPoolManager,
+                                   BufferPoolManager bufferPoolManager) {
         this.host = host;
         this.hosts = Arrays.asList(host.split(HOST_DELIMITER));
         this.port = port;
@@ -155,69 +154,69 @@ public class ClickHouseConfig implements Serializable {
     }
 
     // 各种配置方法
-    public ClickHouseConfig withHostPort(String host, int port) {
+    public ClickHouseClientConfig withHostPort(String host, int port) {
         return Builder.builder(this)
                 .host(host)
                 .port(port)
                 .build(); // 更新主机和端口
     }
 
-    public ClickHouseConfig withDatabase(String database) {
+    public ClickHouseClientConfig withDatabase(String database) {
         return Builder.builder(this)
                 .database(database)
                 .build(); // 更新数据库名
     }
 
-    public ClickHouseConfig withCredentials(String user, String password) {
+    public ClickHouseClientConfig withCredentials(String user, String password) {
         return Builder.builder(this)
                 .user(user)
                 .password(password)
                 .build(); // 更新用户名和密码
     }
 
-    public ClickHouseConfig withQueryTimeout(Duration timeout) {
+    public ClickHouseClientConfig withQueryTimeout(Duration timeout) {
         return Builder.builder(this)
                 .queryTimeout(timeout)
                 .build(); // 更新查询超时时间
     }
 
-    public ClickHouseConfig withTcpKeepAlive(boolean enable) {
+    public ClickHouseClientConfig withTcpKeepAlive(boolean enable) {
         return Builder.builder(this)
                 .tcpKeepAlive(enable)
                 .build(); // 更新TCP保持活动设置
     }
 
-    public ClickHouseConfig withSSL(boolean enable) {
+    public ClickHouseClientConfig withSSL(boolean enable) {
         return Builder.builder(this)
                 .ssl(enable)
                 .build(); // 更新SSL设置
     }
 
-    public ClickHouseConfig withSSLMode(String mode) {
+    public ClickHouseClientConfig withSSLMode(String mode) {
         return Builder.builder(this)
                 .sslMode(mode)
                 .build(); // 更新SSL模式
     }
 
-    public ClickHouseConfig withCharset(Charset charset) {
+    public ClickHouseClientConfig withCharset(Charset charset) {
         return Builder.builder(this)
                 .charset(charset)
                 .build(); // 更新字符集
     }
 
-    public ClickHouseConfig withClientName(String clientName) {
+    public ClickHouseClientConfig withClientName(String clientName) {
         return Builder.builder(this)
                 .clientName(clientName)
                 .build(); // 更新客户端名称
     }
 
-    public ClickHouseConfig withSettings(Map<SettingKey, Serializable> settings) {
+    public ClickHouseClientConfig withSettings(Map<SettingKey, Serializable> settings) {
         return Builder.builder(this)
                 .withSettings(settings)
                 .build(); // 更新设置
     }
 
-    public ClickHouseConfig withProperties(Properties properties) {
+    public ClickHouseClientConfig withProperties(Properties properties) {
         return Builder.builder(this)
                 .withProperties(properties)
                 .build(); // 更新属性
@@ -227,7 +226,7 @@ public class ClickHouseConfig implements Serializable {
         return tcpKeepAlive; // 返回TCP保持活动设置
     }
 
-    // Builder类用于构建ClickHouseConfig实例
+    // Builder类用于构建实例
     public static final class Builder {
         private String host; // 主机名
         private int port; // 端口号
@@ -311,7 +310,7 @@ public class ClickHouseConfig implements Serializable {
             return new Builder(); // 创建新的Builder实例
         }
 
-        public static Builder builder(ClickHouseConfig cfg) {
+        public static Builder builder(ClickHouseClientConfig cfg) {
             return new Builder()
                     .host(cfg.host())
                     .port(cfg.port())
@@ -417,8 +416,8 @@ public class ClickHouseConfig implements Serializable {
             return this.withSettings(ClickhousePropertiesParser.parseProperties(properties)); // 从属性中设置
         }
 
-        public ClickHouseConfig build() {
-            // 构建ClickHouseConfig实例
+        public ClickHouseClientConfig build() {
+            // 构建实例
             this.host = (String) this.settings.getOrDefault(SettingKey.host, "127.0.0.1");
             this.port = ((Number) this.settings.getOrDefault(SettingKey.port, 9000)).intValue();
             this.user = (String) this.settings.getOrDefault(SettingKey.user, "default");
@@ -441,7 +440,7 @@ public class ClickHouseConfig implements Serializable {
             revisit();
             purgeSettings();
 
-            return new ClickHouseConfig(host, port, database, user, password, queryTimeout, connectTimeout,
+            return new ClickHouseClientConfig(host, port, database, user, password, queryTimeout, connectTimeout,
                     tcpKeepAlive, ssl, sslMode, charset.name(), clientName, settings,
                     connectionPoolMaxIdle, connectionPooMinIdle, connectionPoolTotal,
                     serializedIPv4, serializedIPv6, columnWriterBufferPoolManager, bufferPoolManager);

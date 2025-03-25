@@ -12,7 +12,7 @@ import com.berry.clickhouse.tcp.client.jdbc.ClickHouseConnection;
 import com.berry.clickhouse.tcp.client.jdbc.ClickHouseConnectionFactory;
 import com.berry.clickhouse.tcp.client.jdbc.ClickHouseTableMetaData;
 import com.berry.clickhouse.tcp.client.meta.ClickHouseTableMetaDataManager;
-import com.berry.clickhouse.tcp.client.settings.ClickHouseConfig;
+import com.berry.clickhouse.tcp.client.settings.ClickHouseClientConfig;
 import com.berry.clickhouse.tcp.client.stream.QueryResult;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -85,7 +85,7 @@ public class ClickHouseClient {
         /**
          * ClickHouse配置信息
          */
-        private ClickHouseConfig clickHouseConfig;
+        private ClickHouseClientConfig clickHouseClientConfig;
 
         /**
          * 构造函数，初始化表元数据管理器
@@ -111,8 +111,8 @@ public class ClickHouseClient {
          * @param val ClickHouse配置
          * @return Builder实例，支持链式调用
          */
-        public Builder clickHouseConfig(ClickHouseConfig val) {
-            this.clickHouseConfig = val;
+        public Builder config(ClickHouseClientConfig val) {
+            this.clickHouseClientConfig = val;
             return this;
         }
 
@@ -124,23 +124,23 @@ public class ClickHouseClient {
          */
         public ClickHouseClient build() throws Exception {
             // 创建连接并验证连接有效性
-            ClickHouseConnection clickHouseConnection = ClickHouseConnection.createClickHouseConnection(clickHouseConfig);
-            if (!clickHouseConnection.ping(clickHouseConfig.connectTimeout())) {
+            ClickHouseConnection clickHouseConnection = ClickHouseConnection.createClickHouseConnection(clickHouseClientConfig);
+            if (!clickHouseConnection.ping(clickHouseClientConfig.connectTimeout())) {
                 throw new Exception();
             }
 
             // 初始化列写入缓冲工厂
-            ColumnWriterBufferFactory.getInstance(clickHouseConfig);
+            ColumnWriterBufferFactory.getInstance(clickHouseClientConfig);
             serverContext = clickHouseConnection.serverContext();
 
             // 配置连接池参数
             GenericObjectPoolConfig<ClickHouseConnection> genericObjectPoolConfig = new GenericObjectPoolConfig<>();
-            genericObjectPoolConfig.setMaxIdle(clickHouseConfig.getConnectionPoolMaxIdle());
-            genericObjectPoolConfig.setMinIdle(clickHouseConfig.getConnectionPoolMinIdle());
-            genericObjectPoolConfig.setMaxTotal(clickHouseConfig.getConnectionPoolTotal());
+            genericObjectPoolConfig.setMaxIdle(clickHouseClientConfig.getConnectionPoolMaxIdle());
+            genericObjectPoolConfig.setMinIdle(clickHouseClientConfig.getConnectionPoolMinIdle());
+            genericObjectPoolConfig.setMaxTotal(clickHouseClientConfig.getConnectionPoolTotal());
 
             // 创建连接池
-            pool = new GenericObjectPool<>(new ClickHouseConnectionFactory(clickHouseConfig), genericObjectPoolConfig);
+            pool = new GenericObjectPool<>(new ClickHouseConnectionFactory(clickHouseClientConfig), genericObjectPoolConfig);
             pool.use(clickHouseConnection);
             return new ClickHouseClient(this.pool, this.serverContext, this.metaDataManager);
         }

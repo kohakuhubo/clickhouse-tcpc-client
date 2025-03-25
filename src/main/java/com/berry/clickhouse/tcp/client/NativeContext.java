@@ -4,10 +4,9 @@
  */
 package com.berry.clickhouse.tcp.client;
 
-import com.berry.clickhouse.tcp.client.buffer.SocketBuffedReader;
 import com.berry.clickhouse.tcp.client.data.ColumnWriterBufferFactory;
 import com.berry.clickhouse.tcp.client.serde.BinarySerializer;
-import com.berry.clickhouse.tcp.client.settings.ClickHouseConfig;
+import com.berry.clickhouse.tcp.client.settings.ClickHouseClientConfig;
 import com.berry.clickhouse.tcp.client.settings.ClickHouseDefines;
 
 import java.io.IOException;
@@ -190,7 +189,7 @@ public class NativeContext {
         /**
          * ClickHouse配置
          */
-        private final ClickHouseConfig configure;
+        private final ClickHouseClientConfig configure;
         
         /**
          * 列写入缓冲工厂
@@ -208,7 +207,7 @@ public class NativeContext {
          * @param displayName 服务器显示名称
          */
         public ServerContext(long majorVersion, long minorVersion, long reversion,
-                             ClickHouseConfig configure,
+                             ClickHouseClientConfig configure,
                              ZoneId timeZone, String displayName, ColumnWriterBufferFactory columnWriterBufferFactory) {
             this.majorVersion = majorVersion;
             this.minorVersion = minorVersion;
@@ -278,7 +277,7 @@ public class NativeContext {
          * 
          * @return ClickHouse配置
          */
-        public ClickHouseConfig getConfigure() {
+        public ClickHouseClientConfig getConfigure() {
             return configure;
         }
 

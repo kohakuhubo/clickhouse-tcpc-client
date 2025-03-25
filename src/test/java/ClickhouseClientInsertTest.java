@@ -1,7 +1,7 @@
 import com.berry.clickhouse.tcp.client.ClickHouseClient;
 import com.berry.clickhouse.tcp.client.data.Block;
 import com.berry.clickhouse.tcp.client.data.IColumn;
-import com.berry.clickhouse.tcp.client.settings.ClickHouseConfig;
+import com.berry.clickhouse.tcp.client.settings.ClickHouseClientConfig;
 import com.berry.clickhouse.tcp.client.util.ByteConverter;
 
 import java.math.BigDecimal;
@@ -17,7 +17,7 @@ public class ClickhouseClientInsertTest {
 
     public static void main(String[] args) throws Exception {
 
-        ClickHouseConfig clickHouseConfig = ClickHouseConfig.Builder.builder()
+        ClickHouseClientConfig clickHouseClientConfig = ClickHouseClientConfig.Builder.builder()
                 .host("127.0.0.1")
                 .port(9000)
                 .database("berry")
@@ -32,7 +32,7 @@ public class ClickhouseClientInsertTest {
                 .build();
 
         ClickHouseClient client = new ClickHouseClient.Builder()
-                .clickHouseConfig(clickHouseConfig).build();
+                .config(clickHouseClientConfig).build();
         //创建Block
         Block block = client.createBlock("all_data_types_v1");
         //获取id的Column并写入数据

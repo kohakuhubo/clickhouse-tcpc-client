@@ -14,7 +14,7 @@ import com.berry.clickhouse.tcp.client.misc.Validate;
 import com.berry.clickhouse.tcp.client.protocol.*;
 import com.berry.clickhouse.tcp.client.serde.BinaryDeserializer;
 import com.berry.clickhouse.tcp.client.serde.BinarySerializer;
-import com.berry.clickhouse.tcp.client.settings.ClickHouseConfig;
+import com.berry.clickhouse.tcp.client.settings.ClickHouseClientConfig;
 import com.berry.clickhouse.tcp.client.settings.ClickHouseDefines;
 import com.berry.clickhouse.tcp.client.settings.SettingKey;
 import com.berry.clickhouse.tcp.client.stream.ClickHouseQueryResult;
@@ -59,7 +59,7 @@ public class NativeClient {
      * @return 新创建的NativeClient实例
      * @throws SQLException 如果连接失败
      */
-    public static NativeClient connect(ClickHouseConfig config) throws SQLException {
+    public static NativeClient connect(ClickHouseClientConfig config) throws SQLException {
         return connect(config.host(), config.port(), config);
     }
 
@@ -72,7 +72,7 @@ public class NativeClient {
      * @return 新创建的NativeClient实例
      * @throws SQLException 如果连接失败
      */
-    public static NativeClient connect(String host, int port, ClickHouseConfig config) throws SQLException {
+    public static NativeClient connect(String host, int port, ClickHouseClientConfig config) throws SQLException {
         try {
             SocketAddress endpoint = new InetSocketAddress(host, port);
             Socket socket;

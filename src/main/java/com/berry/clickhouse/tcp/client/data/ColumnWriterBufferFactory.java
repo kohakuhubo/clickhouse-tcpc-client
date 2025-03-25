@@ -1,7 +1,7 @@
 package com.berry.clickhouse.tcp.client.data;
 
 import com.berry.clickhouse.tcp.client.buffer.BufferPoolManager;
-import com.berry.clickhouse.tcp.client.settings.ClickHouseConfig;
+import com.berry.clickhouse.tcp.client.settings.ClickHouseClientConfig;
 
 /**
  * ColumnWriterBufferFactory类用于创建ColumnWriterBuffer实例
@@ -18,14 +18,14 @@ public class ColumnWriterBufferFactory {
     /**
      * 获取ColumnWriterBufferFactory的单例实例
      * 
-     * @param clickHouseConfig ClickHouse配置
+     * @param clickHouseClientConfig ClickHouse配置
      * @return ColumnWriterBufferFactory实例
      */
-    public static ColumnWriterBufferFactory getInstance(ClickHouseConfig clickHouseConfig) {
+    public static ColumnWriterBufferFactory getInstance(ClickHouseClientConfig clickHouseClientConfig) {
         if (null == INSTANCE) {
             synchronized (ColumnWriterBufferFactory.class) {
                 if (null == INSTANCE) {
-                    INSTANCE = new ColumnWriterBufferFactory(clickHouseConfig); // 创建新的实例
+                    INSTANCE = new ColumnWriterBufferFactory(clickHouseClientConfig); // 创建新的实例
                 }
             }
         }
@@ -35,11 +35,11 @@ public class ColumnWriterBufferFactory {
     /**
      * 构造函数，初始化ColumnWriterBufferFactory
      * 
-     * @param clickHouseConfig ClickHouse配置
+     * @param clickHouseClientConfig ClickHouse配置
      */
-    private ColumnWriterBufferFactory(ClickHouseConfig clickHouseConfig) {
-        this.columnWriterBufferPoolManager = clickHouseConfig.getColumnWriterBufferPoolManager(); // 获取列写入缓冲区管理器
-        this.bufferPoolManager = clickHouseConfig.getBufferPoolManager(); // 获取缓冲池管理器
+    private ColumnWriterBufferFactory(ClickHouseClientConfig clickHouseClientConfig) {
+        this.columnWriterBufferPoolManager = clickHouseClientConfig.getColumnWriterBufferPoolManager(); // 获取列写入缓冲区管理器
+        this.bufferPoolManager = clickHouseClientConfig.getBufferPoolManager(); // 获取缓冲池管理器
     }
 
     /**

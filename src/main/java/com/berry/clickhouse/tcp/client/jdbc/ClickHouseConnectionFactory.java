@@ -1,6 +1,6 @@
 package com.berry.clickhouse.tcp.client.jdbc;
 
-import com.berry.clickhouse.tcp.client.settings.ClickHouseConfig;
+import com.berry.clickhouse.tcp.client.settings.ClickHouseClientConfig;
 import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.DestroyMode;
 import org.apache.commons.pool2.PooledObject;
@@ -12,14 +12,14 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
  */
 public class ClickHouseConnectionFactory extends BasePooledObjectFactory<ClickHouseConnection> {
 
-    private final ClickHouseConfig config; // 连接配置
+    private final ClickHouseClientConfig config; // 连接配置
 
     /**
      * 构造函数，初始化连接工厂
      * 
      * @param config ClickHouse配置
      */
-    public ClickHouseConnectionFactory(ClickHouseConfig config) {
+    public ClickHouseConnectionFactory(ClickHouseClientConfig config) {
         this.config = config;
     }
 

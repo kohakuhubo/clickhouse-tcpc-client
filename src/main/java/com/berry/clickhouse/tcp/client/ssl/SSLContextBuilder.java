@@ -3,7 +3,7 @@ package com.berry.clickhouse.tcp.client.ssl;
 import com.berry.clickhouse.tcp.client.NativeClient;
 import com.berry.clickhouse.tcp.client.log.Logger;
 import com.berry.clickhouse.tcp.client.log.LoggerFactory;
-import com.berry.clickhouse.tcp.client.settings.ClickHouseConfig;
+import com.berry.clickhouse.tcp.client.settings.ClickHouseClientConfig;
 import com.berry.clickhouse.tcp.client.settings.KeyStoreConfig;
 import com.berry.clickhouse.tcp.client.settings.SettingKey;
 
@@ -21,7 +21,7 @@ import java.security.cert.CertificateException;
 public class SSLContextBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(NativeClient.class); // 日志记录器
 
-    private ClickHouseConfig config; // ClickHouse配置
+    private ClickHouseClientConfig config; // ClickHouse配置
     private KeyStoreConfig keyStoreConfig; // 密钥库配置
 
     /**
@@ -29,7 +29,7 @@ public class SSLContextBuilder {
      * 
      * @param config ClickHouse配置
      */
-    public SSLContextBuilder(ClickHouseConfig config) {
+    public SSLContextBuilder(ClickHouseClientConfig config) {
         this.config = config;
         this.keyStoreConfig = new KeyStoreConfig(
                 (String) config.settings().get(SettingKey.keyStoreType),
